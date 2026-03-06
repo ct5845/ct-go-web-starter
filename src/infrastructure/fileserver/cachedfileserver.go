@@ -1,6 +1,7 @@
 package fileserver
 
 import (
+	"compress/gzip"
 	"crypto/md5"
 	"fmt"
 	"io"
@@ -18,22 +19,36 @@ type CachedFileServer struct {
 	mutex sync.RWMutex
 }
 
-type responseWriterWrapper struct {
+type gzipResponseWriter struct {
 	http.ResponseWriter
+	gzWriter  *gzip.Writer
 	etag      string
 	hasETag   bool
 	headerSet bool
 }
 
-func (rw *responseWriterWrapper) WriteHeader(statusCode int) {
-	if !rw.headerSet && rw.hasETag {
-		rw.Header().Set("ETag", rw.etag)
-		// Use no-cache with ETag to force revalidation
-		// Browser will check ETag on every request, enabling cache busting
+func (rw *gzipResponseWriter) Write(b []byte) (int, error) {
+	if !rw.headerSet {
+		rw.WriteHeader(http.StatusOK)
+	}
+	return rw.gzWriter.Write(b)
+}
+
+func (rw *gzipResponseWriter) WriteHeader(statusCode int) {
+	if !rw.headerSet {
+		if rw.hasETag {
+			rw.Header().Set("ETag", rw.etag)
+		}
 		rw.Header().Set("Cache-Control", "public, no-cache, must-revalidate")
+		rw.Header().Set("Content-Encoding", "gzip")
+		rw.Header().Del("Content-Length")
 		rw.headerSet = true
 	}
 	rw.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (rw *gzipResponseWriter) Close() error {
+	return rw.gzWriter.Close()
 }
 
 func NewCachedFileServer(dir string) *CachedFileServer {
@@ -92,15 +107,6 @@ func (cfs *CachedFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	etag, hasETag := cfs.etags[r.URL.Path]
 	cfs.mutex.RUnlock()
 
-
-	// Create a wrapped ResponseWriter to intercept header writes
-	wrappedWriter := &responseWriterWrapper{
-		ResponseWriter: w,
-		etag:          etag,
-		hasETag:       hasETag,
-		headerSet:     false,
-	}
-
 	if hasETag {
 		// Handle If-None-Match header
 		if match := r.Header.Get("If-None-Match"); match == etag {
@@ -110,9 +116,30 @@ func (cfs *CachedFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Serve the file using standard file server with our wrapped writer
+	// Check if client accepts gzip
+	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		gzWriter := gzip.NewWriter(w)
+		defer gzWriter.Close()
+
+		gzWrapped := &gzipResponseWriter{
+			ResponseWriter: w,
+			gzWriter:       gzWriter,
+			etag:           etag,
+			hasETag:        hasETag,
+		}
+
+		fileServer := http.FileServer(http.Dir(cfs.dir))
+		fileServer.ServeHTTP(gzWrapped, r)
+		return
+	}
+
+	// Fallback: serve without gzip
+	if hasETag {
+		w.Header().Set("ETag", etag)
+		w.Header().Set("Cache-Control", "public, no-cache, must-revalidate")
+	}
 	fileServer := http.FileServer(http.Dir(cfs.dir))
-	fileServer.ServeHTTP(wrappedWriter, r)
+	fileServer.ServeHTTP(w, r)
 }
 
 func (cfs *CachedFileServer) RefreshETags() {

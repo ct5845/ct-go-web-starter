@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@source "../**/*.{html,js,go}";
+@source "../../**/*.{html,js,go}";
 
 @theme {
   --color-primary-50: #eff6ff;

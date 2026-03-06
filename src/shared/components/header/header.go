@@ -1,8 +1,7 @@
 package header
 
 import (
-	_ "ct-go-web-starter/src/infrastructure/config"
-	"ct-go-web-starter/src/shared/utils"
+	"ct-go-web-starter/src/shared/component"
 	_ "embed"
 	"html/template"
 	"log/slog"
@@ -10,19 +9,15 @@ import (
 
 //go:embed header.html
 var headerHTML string
-var component = utils.NewComponent("header.html", headerHTML)
-
-type Data struct {
-	Title string
-}
+var comp = component.New("header.html", headerHTML)
 
 func init() {
 	slog.Debug("Header component initialized", "component", "header")
 }
 
-func Render(data Data) (template.HTML, error) {
+func Render(keysAndValues ...any) (template.HTML, error) {
 	slog.Debug("Rendering header component", "component", "header")
-	result, err := component.Render(data)
+	result, err := comp.Render(keysAndValues...)
 	if err != nil {
 		slog.Error("Failed to render header component", "error", err)
 		return "", err

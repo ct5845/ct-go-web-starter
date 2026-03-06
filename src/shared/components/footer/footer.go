@@ -1,8 +1,7 @@
 package footer
 
 import (
-	_ "ct-go-web-starter/src/infrastructure/config"
-	"ct-go-web-starter/src/shared/utils"
+	"ct-go-web-starter/src/shared/component"
 	_ "embed"
 	"html/template"
 	"log/slog"
@@ -10,17 +9,15 @@ import (
 
 //go:embed footer.html
 var footerHTML string
-var component = utils.NewComponent("footer.html", footerHTML)
-
-type Data struct{}
+var comp = component.New("footer.html", footerHTML)
 
 func init() {
 	slog.Debug("Footer component initialized", "component", "footer")
 }
 
-func Render(data Data) (template.HTML, error) {
+func Render(keysAndValues ...any) (template.HTML, error) {
 	slog.Debug("Rendering footer component", "component", "footer")
-	result, err := component.Render(data)
+	result, err := comp.Render(keysAndValues...)
 	if err != nil {
 		slog.Error("Failed to render footer component", "error", err)
 		return "", err

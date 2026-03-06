@@ -1,15 +1,20 @@
 package home
 
 import (
-	"ct-go-web-starter/src/shared/components/footer"
-	"ct-go-web-starter/src/shared/components/header"
-	"ct-go-web-starter/src/shared/templates"
-	"ct-go-web-starter/src/shared/utils"
-	"html/template"
+	_ "embed"
 	"io"
 	"log/slog"
 	"net/http"
+
+	"ct-go-web-starter/src/shared/component"
+	"ct-go-web-starter/src/shared/components/footer"
+	"ct-go-web-starter/src/shared/components/header"
+	"ct-go-web-starter/src/shared/templates"
 )
+
+//go:embed home.html
+var homeHTML string
+var tmpl = component.New("home.html", homeHTML)
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("Rendering index page", "pages", "index", "path", r.URL.Path)
@@ -19,33 +24,26 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	header, err := header.Render(header.Data{Title: "CT Go Web Starter"})
-
+	headerHTML, err := header.Render("Title", "CT Go Web Starter")
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	footer, err := footer.Render(footer.Data{})
-
+	footerHTML, err := footer.Render()
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	content, err := utils.LoadComponent("features/home/home.html")
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+	contentHTML := tmpl.MustRender()
 
-	page, err := templates.Render(templates.Data{
-		Title:       "CT Go Web Starter",
-		HeaderHTML:  header,
-		ContentHTML: template.HTML(content),
-		FooterHTML:  footer,
-	})
-
+	page, err := templates.Render(
+		"Title", "CT Go Web Starter",
+		"HeaderHTML", headerHTML,
+		"ContentHTML", contentHTML,
+		"FooterHTML", footerHTML,
+	)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

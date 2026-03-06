@@ -1,8 +1,7 @@
 package templates
 
 import (
-	_ "ct-go-web-starter/src/infrastructure/config"
-	"ct-go-web-starter/src/shared/utils"
+	"ct-go-web-starter/src/shared/component"
 	_ "embed"
 	"html/template"
 	"log/slog"
@@ -10,26 +9,19 @@ import (
 
 //go:embed page.html
 var pageHTML string
-var component = utils.NewComponent("page.html", pageHTML)
-
-type Data struct {
-	Title       string
-	HeaderHTML  template.HTML
-	ContentHTML template.HTML
-	FooterHTML  template.HTML
-}
+var comp = component.New("page.html", pageHTML)
 
 func init() {
 	slog.Debug("Page template initialized", "component", "page")
 }
 
-func Render(data Data) (template.HTML, error) {
-	slog.Debug("Rendering page template", "component", "page", "title", data.Title)
-	result, err := component.Render(data)
+func Render(keysAndValues ...any) (template.HTML, error) {
+	slog.Debug("Rendering page template", "component", "page")
+	result, err := comp.Render(keysAndValues...)
 	if err != nil {
-		slog.Error("Failed to render page template", "error", err, "title", data.Title)
+		slog.Error("Failed to render page template", "error", err)
 		return "", err
 	}
-	slog.Debug("Page template rendered successfully", "component", "page", "title", data.Title)
+	slog.Debug("Page template rendered successfully", "component", "page")
 	return result, nil
 }

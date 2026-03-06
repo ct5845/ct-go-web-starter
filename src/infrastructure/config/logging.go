@@ -58,7 +58,7 @@ func (h *ColorHandler) Handle(ctx context.Context, r slog.Record) error {
 
 	// Format: [LEVEL] source:line message key=value
 	var buf strings.Builder
-	
+
 	// Level with color
 	buf.WriteString(color)
 	buf.WriteString("[" + r.Level.String() + "]")
@@ -100,7 +100,7 @@ func (h *ColorHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 }
 
 func (h *ColorHandler) WithGroup(name string) slog.Handler {
-	// For simplicity, return the same handler  
+	// For simplicity, return the same handler
 	return h
 }
 

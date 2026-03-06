@@ -1,22 +1,15 @@
 {
-  "name": "ct-web-starter",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "ct-go-web-starter",
+  "private": true,
   "scripts": {
-    "build-css": "tailwindcss -i ./src/styles/styles.css -o ./build/static/style.css --minify",
-    "dev": "air",
-    "build": "go generate . && go build -o ./build/main.exe ."
+    "build-css": "tailwindcss -i ./src/static/styles/styles.css -o ./tmp/static/style.css --minify"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
-    "@tailwindcss/cli": "^4.1.12",
-    "tailwindcss": "^4.1.12"
+    "@tailwindcss/cli": "4.2.1",
+    "tailwindcss": "4.2.1"
   },
   "dependencies": {
-    "alpinejs": "^3.14.9",
-    "htmx.org": "^2.0.6"
+    "alpinejs": "3.15.8",
+    "htmx.org": "2.0.8"
   }
 }

@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	if err := os.MkdirAll("build", 0755); err != nil {
-		slog.Error("Failed to create build directory", "error", err)
+	if err := os.MkdirAll("tmp/static", 0755); err != nil {
+		slog.Error("Failed to create tmp/static directory", "error", err)
 		panic(err)
 	}
 
@@ -26,43 +26,34 @@ func main() {
 }
 
 func copyAssets() error {
-	// Copy assets from src/static to build/static
-	err := utils.CopyDir("src/static", "build/static")
+	err := utils.CopyDir("src/static", "tmp/static")
 	if err != nil {
 		slog.Error("Failed to copy assets", "error", err)
 		return err
 	}
 
-	slog.Info("Copied assets to build/static", "src", "src/static", "dst", "build/static")
+	slog.Info("Copied assets to tmp/static")
 	return nil
 }
 
 func copyAlpineJS() error {
-	// Copy Alpine.js from node_modules to build/static
-	srcPath := "node_modules/alpinejs/dist/cdn.min.js"
-	dstPath := "build/static/alpine.min.js"
-
-	err := utils.CopyFile(srcPath, dstPath)
+	err := utils.CopyFile("node_modules/alpinejs/dist/cdn.min.js", "tmp/static/alpine.min.js")
 	if err != nil {
 		slog.Error("Failed to copy Alpine.js", "error", err)
 		return err
 	}
 
-	slog.Info("Copied Alpine.js to build/static", "src", srcPath, "dst", dstPath)
+	slog.Info("Copied Alpine.js to tmp/static")
 	return nil
 }
 
 func copyHTMX() error {
-	// Copy HTMX from node_modules to build/static
-	srcPath := "node_modules/htmx.org/dist/htmx.min.js"
-	dstPath := "build/static/htmx.min.js"
-
-	err := utils.CopyFile(srcPath, dstPath)
+	err := utils.CopyFile("node_modules/htmx.org/dist/htmx.min.js", "tmp/static/htmx.min.js")
 	if err != nil {
 		slog.Error("Failed to copy HTMX", "error", err)
 		return err
 	}
 
-	slog.Info("Copied HTMX to build/static", "src", srcPath, "dst", dstPath)
+	slog.Info("Copied HTMX to tmp/static")
 	return nil
 }

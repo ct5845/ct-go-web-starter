@@ -19,7 +19,7 @@ func App() {
 	})
 
 	// Static files with ETag caching
-	cachedFS := fileserver.NewCachedFileServer("build/static/")
+	cachedFS := fileserver.NewCachedFileServer("tmp/static/")
 	mux.Handle("/static/", http.StripPrefix("/static/", cachedFS))
 
 	slog.Info("Server starting on http://localhost:8080")
