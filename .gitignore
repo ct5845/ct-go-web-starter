@@ -48,7 +48,6 @@ bin/
 
 # Claude Code configuration and files
 .claude/
-CLAUDE.md
 claude.config.json
 
 # Node.js dependencies and files
