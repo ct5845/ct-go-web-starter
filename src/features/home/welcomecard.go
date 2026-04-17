@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"html/template"
 
-	"ct-go-web-starter/src/shared/component"
+	"ct-go-web-starter/src/components/component"
 )
 
 //go:embed welcomecard.html

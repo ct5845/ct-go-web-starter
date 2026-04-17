@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"html/template"
 
-	"ct-go-web-starter/src/shared/component"
-	"ct-go-web-starter/src/shared/components/footer"
-	"ct-go-web-starter/src/shared/components/header"
-	"ct-go-web-starter/src/shared/templates"
+	"ct-go-web-starter/src/components/component"
+	"ct-go-web-starter/src/components/footer"
+	"ct-go-web-starter/src/components/header"
+	"ct-go-web-starter/src/components/page"
 )
 
 //go:embed home.html
@@ -36,7 +36,7 @@ func renderPage() (template.HTML, error) {
 		return "", fmt.Errorf("home page: render content: %w", err)
 	}
 
-	page, err := templates.Render(
+	pageHTML, err := page.Render(
 		"Title", "CT Go Web Starter",
 		"HeaderHTML", headerHTML,
 		"ContentHTML", contentHTML,
@@ -46,5 +46,5 @@ func renderPage() (template.HTML, error) {
 		return "", fmt.Errorf("home page: render page: %w", err)
 	}
 
-	return page, nil
+	return pageHTML, nil
 }

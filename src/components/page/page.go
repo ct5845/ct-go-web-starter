@@ -1,7 +1,7 @@
-package templates
+package page
 
 import (
-	"ct-go-web-starter/src/shared/component"
+	"ct-go-web-starter/src/components/component"
 	_ "embed"
 	"html/template"
 )

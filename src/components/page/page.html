@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Go | HTMX | Alpine | Tailwind | Starter Project"
+    />
+    <title>{{.Title}}</title>
+
+    <link rel="manifest" href="/static/manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+    <link href="/static/style.css" rel="stylesheet" />
+    <script defer src="/static/htmx.min.js"></script>
+    <script defer src="/static/alpine.min.js"></script>
+  </head>
+  <body>
+    {{.HeaderHTML}}
+    <main>{{.ContentHTML}}</main>
+    {{.FooterHTML}}
+
+    <script>
+      navigator.serviceWorker.register("/sw.js").catch(function (error) {
+        console.error("Service Worker registration failed:", error);
+      });
+    </script>
+  </body>
+</html>

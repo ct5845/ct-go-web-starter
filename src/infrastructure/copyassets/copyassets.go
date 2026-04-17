@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ct-go-web-starter/src/infrastructure/fs"
+	"ct-go-web-starter/src/infrastructure/filesystem"
 	"log/slog"
 	"os"
 )
@@ -26,7 +26,7 @@ func main() {
 }
 
 func copyAssets() error {
-	err := fs.CopyDir("src/static", "tmp/static")
+	err := filesystem.CopyDir("src/static", "tmp/static")
 	if err != nil {
 		slog.Error("Failed to copy assets", "error", err)
 		return err
@@ -37,7 +37,7 @@ func copyAssets() error {
 }
 
 func copyAlpineJS() error {
-	err := fs.CopyFile("node_modules/alpinejs/dist/cdn.min.js", "tmp/static/alpine.min.js")
+	err := filesystem.CopyFile("node_modules/alpinejs/dist/cdn.min.js", "tmp/static/alpine.min.js")
 	if err != nil {
 		slog.Error("Failed to copy Alpine.js", "error", err)
 		return err
@@ -48,7 +48,7 @@ func copyAlpineJS() error {
 }
 
 func copyHTMX() error {
-	err := fs.CopyFile("node_modules/htmx.org/dist/htmx.min.js", "tmp/static/htmx.min.js")
+	err := filesystem.CopyFile("node_modules/htmx.org/dist/htmx.min.js", "tmp/static/htmx.min.js")
 	if err != nil {
 		slog.Error("Failed to copy HTMX", "error", err)
 		return err

@@ -1,4 +1,4 @@
-.PHONY: dev build
+.PHONY: dev run build
 
 dev:
 	air

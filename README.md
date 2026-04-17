@@ -51,17 +51,17 @@ The application will be available at `http://localhost:8080`
 
 ```
 ├── src/
-│   ├── features/           # Feature-based organization (vertical slices)
+│   ├── features/           # Features with HTTP surface (routes + handlers)
 │   │   └── home/          # Home page feature
-│   │       ├── handler.go # HTTP handler for home routes
-│   │       └── home.html  # Feature-specific template
-│   ├── shared/            # Shared components and utilities
-│   │   ├── components/    # Reusable UI components
-│   │   │   ├── header/    # Header component
-│   │   │   └── footer/    # Footer component
-│   │   ├── templates/     # Base page templates
-│   │   └── utils/         # Common utility functions
-│   ├── infrastructure/    # Cross-cutting infrastructure concerns
+│   │       ├── handler.go # HTTP handler
+│   │       ├── page.go    # Page assembly (subcomponents, data prep)
+│   │       └── home.html  # Feature template
+│   ├── components/        # UI building blocks with no HTTP surface
+│   │   ├── component/     # Component engine (New, Render, WithJS)
+│   │   ├── header/        # Site header
+│   │   ├── footer/        # Site footer
+│   │   └── page/          # Full page shell template
+│   ├── infrastructure/    # Platform and runtime concerns
 │   │   ├── config/        # Configuration and logging
 │   │   └── fileserver/    # Static file serving with caching
 │   ├── static/           # Static assets (favicon, images, etc.)
@@ -83,18 +83,18 @@ The application will be available at `http://localhost:8080`
 ### Adding New Features
 
 1. Create a new feature directory in `src/features/`
-2. Add handler.go and feature-specific templates
+2. Add `handler.go` and feature-specific templates
 3. Register routes in `src/app.go`
-4. Use shared components from `src/shared/components/`
+4. Use components from `src/components/` or create feature-internal ones in the feature directory
 
 **Example: Adding a "blog" feature**
 ```
 src/features/blog/
-├── handler.go          # Blog route handlers
-├── list.html          # Blog post listing template
-├── detail.html        # Individual blog post template
-└── components/         # Blog-specific components
-    └── post-card.html
+├── handler.go     # HTTP handler
+├── page.go        # Page assembly
+├── list.html      # Blog listing template
+└── postcard.go    # Feature-internal component (unexported)
+└── postcard.html
 ```
 
 ### Styling
