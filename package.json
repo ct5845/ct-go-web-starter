@@ -5,11 +5,11 @@
     "build-css": "tailwindcss -i ./src/static/styles/styles.css -o ./tmp/static/style.css --minify"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "4.2.1",
-    "tailwindcss": "4.2.1"
+    "@tailwindcss/cli": "4.3.0",
+    "tailwindcss": "4.3.0"
   },
   "dependencies": {
-    "alpinejs": "3.15.8",
-    "htmx.org": "2.0.8"
+    "alpinejs": "3.15.12",
+    "htmx.org": "2.0.10"
   }
 }

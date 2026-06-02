@@ -65,6 +65,7 @@ See `src/features/home/` for a working example of this pattern.
 ## Language-Specific Guidelines
 
 - Go: see [agents/golang.md](agents/golang.md)
+- HTML: see [agents/html.md](agents/html.md)
 
 ## Testing
 
