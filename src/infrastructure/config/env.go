@@ -5,10 +5,10 @@ import (
 	"os"
 )
 
-var DirectusURL string
+// example: var MyKey string
 
 func Load() {
-	DirectusURL = mustGetEnv("DIRECTUS_URL")
+	// example: MyKey = mustGetEnv("MY_KEY")
 }
 
 func mustGetEnv(key string) string {
