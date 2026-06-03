@@ -2,6 +2,7 @@ package fileserver
 
 import (
 	"crypto/md5"
+	"ct-go-web-starter/src/infrastructure/reqlog"
 	"fmt"
 	"io"
 	"log/slog"
@@ -14,9 +15,13 @@ import (
 
 func RegisterRoutes(mux *http.ServeMux, dir string) {
 	cachedFS := NewCachedFileServer(dir)
-	mux.Handle("/static/", http.StripPrefix("/static/", cachedFS))
-	mux.Handle("GET /sw.js", http.StripPrefix("/", cachedFS))
-	mux.Handle("GET /robots.txt", http.StripPrefix("/", cachedFS))
+	skipped := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reqlog.Skip(r.Context())
+		cachedFS.ServeHTTP(w, r)
+	})
+	mux.Handle("/static/", http.StripPrefix("/static/", skipped))
+	mux.Handle("GET /sw.js", http.StripPrefix("/", skipped))
+	mux.Handle("GET /robots.txt", http.StripPrefix("/", skipped))
 }
 
 type CachedFileServer struct {

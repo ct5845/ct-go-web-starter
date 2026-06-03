@@ -7,21 +7,23 @@ import (
 	"strings"
 )
 
-func Handler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
-			h.ServeHTTP(w, r)
-			return
-		}
+func Middleware() func(http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+				h.ServeHTTP(w, r)
+				return
+			}
 
-		gz := gzip.NewWriter(w)
-		defer gz.Close()
+			gz := gzip.NewWriter(w)
+			defer gz.Close()
 
-		w.Header().Set("Content-Encoding", "gzip")
-		w.Header().Set("Vary", "Accept-Encoding")
+			w.Header().Set("Content-Encoding", "gzip")
+			w.Header().Set("Vary", "Accept-Encoding")
 
-		h.ServeHTTP(gzipResponseWriter{ResponseWriter: w, Writer: gz}, r)
-	})
+			h.ServeHTTP(gzipResponseWriter{ResponseWriter: w, Writer: gz}, r)
+		})
+	}
 }
 
 type gzipResponseWriter struct {

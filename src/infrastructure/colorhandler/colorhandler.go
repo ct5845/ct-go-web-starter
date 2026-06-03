@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-// ANSI color codes
 const (
 	colorReset  = "\033[0m"
 	colorRed    = "\033[31m"
@@ -18,6 +17,8 @@ const (
 	colorBlue   = "\033[34m"
 	colorGray   = "\033[37m"
 	colorCyan   = "\033[36m"
+	colorGreen  = "\033[32m"
+	colorDim    = "\033[2m"
 )
 
 type ColorHandler struct {
@@ -35,12 +36,11 @@ func New(out io.Writer, opts *slog.HandlerOptions) *ColorHandler {
 	}
 }
 
-func (h *ColorHandler) Enabled(ctx context.Context, level slog.Level) bool {
+func (h *ColorHandler) Enabled(_ context.Context, level slog.Level) bool {
 	return level >= h.opts.Level.Level()
 }
 
-func (h *ColorHandler) Handle(ctx context.Context, r slog.Record) error {
-	// Choose color based on level
+func (h *ColorHandler) Handle(_ context.Context, r slog.Record) error {
 	var color string
 	switch r.Level {
 	case slog.LevelDebug:
@@ -55,16 +55,13 @@ func (h *ColorHandler) Handle(ctx context.Context, r slog.Record) error {
 		color = colorReset
 	}
 
-	// Format: [LEVEL] source:line message key=value
 	var buf strings.Builder
 
-	// Level with color
 	buf.WriteString(color)
 	buf.WriteString("[" + r.Level.String() + "]")
 	buf.WriteString(colorReset)
 	buf.WriteString(" ")
 
-	// Source location if enabled
 	if h.opts.AddSource && r.PC != 0 {
 		fs := runtime.CallersFrames([]uintptr{r.PC})
 		f, _ := fs.Next()
@@ -76,29 +73,42 @@ func (h *ColorHandler) Handle(ctx context.Context, r slog.Record) error {
 		}
 	}
 
-	// Message
 	buf.WriteString(r.Message)
 
-	// Attributes
+	// Collect attrs, handling request_id and timing specially.
+	var reqID, timing string
+	var attrs []string
+
 	r.Attrs(func(a slog.Attr) bool {
-		buf.WriteString(" ")
-		buf.WriteString(a.Key)
-		buf.WriteString("=")
-		buf.WriteString(a.Value.String())
+		switch a.Key {
+		case "request_id":
+			id := a.Value.String()
+			if len(id) > 8 {
+				id = id[len(id)-8:]
+			}
+			reqID = id
+		case "timing":
+			timing = a.Value.String()
+		default:
+			attrs = append(attrs, a.Key+"="+a.Value.String())
+		}
 		return true
 	})
+
+	if reqID != "" {
+		buf.WriteString(" " + colorGreen + "[" + reqID + "]" + colorReset)
+	}
+	for _, attr := range attrs {
+		buf.WriteString(" " + colorDim + attr + colorReset)
+	}
+	if timing != "" {
+		buf.WriteString("\n    " + colorDim + timing + colorReset)
+	}
 
 	buf.WriteString("\n")
 	_, err := h.out.Write([]byte(buf.String()))
 	return err
 }
 
-func (h *ColorHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	// For simplicity, return the same handler
-	return h
-}
-
-func (h *ColorHandler) WithGroup(name string) slog.Handler {
-	// For simplicity, return the same handler
-	return h
-}
+func (h *ColorHandler) WithAttrs(_ []slog.Attr) slog.Handler { return h }
+func (h *ColorHandler) WithGroup(_ string) slog.Handler      { return h }

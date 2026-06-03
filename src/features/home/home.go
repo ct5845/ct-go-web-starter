@@ -5,6 +5,7 @@ import (
 	"ct-go-web-starter/src/components/layouttabbed"
 	"ct-go-web-starter/src/components/page"
 	"ct-go-web-starter/src/features/nav"
+	"ct-go-web-starter/src/infrastructure/reqlog"
 	_ "embed"
 	"fmt"
 	"html/template"
@@ -22,6 +23,7 @@ func RegisterRoutes(mux *http.ServeMux) {
 }
 
 func HandleGet(w http.ResponseWriter, r *http.Request) {
+	defer reqlog.Track(r.Context(), "home.HandleGet", "")()
 	page, err := render()
 
 	if err != nil {

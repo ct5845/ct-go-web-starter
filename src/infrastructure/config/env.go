@@ -6,9 +6,11 @@ import (
 )
 
 var Port string
+var AppEnv string
 
 func Load() {
 	Port = getEnvOr("PORT", "8080")
+	AppEnv = getEnvOr("APP_ENV", "dev")
 }
 
 func mustGetEnv(key string) string {
