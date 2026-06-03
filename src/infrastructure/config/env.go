@@ -5,10 +5,10 @@ import (
 	"os"
 )
 
-// example: var MyKey string
+var Port string
 
 func Load() {
-	// example: MyKey = mustGetEnv("MY_KEY")
+	Port = getEnvOr("PORT", "8080")
 }
 
 func mustGetEnv(key string) string {
@@ -17,4 +17,11 @@ func mustGetEnv(key string) string {
 		panic(fmt.Sprintf("config: %s environment variable is required", key))
 	}
 	return v
+}
+
+func getEnvOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
 }

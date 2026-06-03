@@ -9,17 +9,18 @@ import (
 
 func Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			h.ServeHTTP(w, r)
+			return
+		}
+
 		gz := gzip.NewWriter(w)
 		defer gz.Close()
 
-		if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
-			w.Header().Set("Content-Encoding", "gzip")
-			w.Header().Set("Vary", "Accept-Encoding")
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Set("Vary", "Accept-Encoding")
 
-			w = gzipResponseWriter{ResponseWriter: w, Writer: gz}
-		}
-
-		h.ServeHTTP(w, r)
+		h.ServeHTTP(gzipResponseWriter{ResponseWriter: w, Writer: gz}, r)
 	})
 }
 

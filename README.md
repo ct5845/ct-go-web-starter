@@ -10,6 +10,8 @@ A modern Go web application starter template with HTMX, Alpine.js, and TailwindC
 - **TailwindCSS** - Utility-first CSS framework
 - **Live Reload** - Air integration for development hot reloading
 - **Static Asset Caching** - Built-in ETag support for efficient caching
+- **Gzip Compression** - Automatic response compression for supporting clients
+- **Graceful Shutdown** - Drains in-flight requests on SIGINT/SIGTERM
 - **Feature-Based Architecture** - Organized by features (vertical slices) for better maintainability
 
 ## Quick Start
@@ -33,12 +35,17 @@ A modern Go web application starter template with HTMX, Alpine.js, and TailwindC
    go mod tidy
    ```
 
-3. Run the development server:
+3. Copy `.env.example` to `.env` and adjust as needed:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Run the development server:
    ```bash
    make dev
    ```
 
-The application will be available at `http://localhost:8080`
+The application will be available at `http://localhost:8080` (or the port set in `PORT`).
 
 ## Development
 
@@ -103,6 +110,8 @@ Build the application for production:
 make build
 ./build/web
 ```
+
+The server binds to `0.0.0.0:<PORT>` (default `8080`), so it works in containers and behind reverse proxies. Set `PORT` via environment variable — no `.env` file is required in production.
 
 ## License
 

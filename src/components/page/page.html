@@ -60,9 +60,11 @@
     <script defer src="/static/htmx.min.js"></script>
     <script defer src="/static/alpine.min.js"></script>
     <script>
-      navigator.serviceWorker.register("/sw.js").catch(function (error) {
-        console.error("Service Worker registration failed:", error);
-      });
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register("/sw.js").catch(function (error) {
+          console.error("Service Worker registration failed:", error);
+        });
+      }
     </script>
     <link rel="manifest" href="/static/manifest.json" fetchpriority="low" />
   </head>
