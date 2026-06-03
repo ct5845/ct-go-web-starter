@@ -4,15 +4,15 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  bin = "./tmp/web.exe"
-  pre_cmd = ["cmd /c npm run build-css", "go run ./cmd/copyassets"]
-  cmd = "go build -o ./tmp/web.exe ./cmd/web"
+  entrypoint = "./tmp/web"
+  pre_cmd = ["npm run build-css", "go run ./cmd/copyassets"]
+  cmd = "go build -o ./tmp/web ./cmd/web"
   delay = 0
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules", "build", ".claude", "agents", "scripts"]
   exclude_file = []
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
-  follow_symlink = false
+  follow_symlinks = false
   full_bin = ""
   include_dir = ["src", "cmd/web"]
   include_ext = ["go", "js", "html", "css"]

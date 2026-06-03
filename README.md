@@ -18,8 +18,9 @@ A modern Go web application starter template with HTMX, Alpine.js, and TailwindC
 
 ### Prerequisites
 
-- Go 1.24.2 or later
-- Node.js (for TailwindCSS and frontend dependencies)
+- Go 1.26 or later
+- Node.js 24 or later
+- [Air](https://github.com/air-verse/air) for live reload (`go install github.com/air-verse/air@latest`)
 
 ### Installation
 
@@ -47,6 +48,8 @@ A modern Go web application starter template with HTMX, Alpine.js, and TailwindC
 
 The application will be available at `http://localhost:8080` (or the port set in `PORT`).
 
+> `make dev` detects the OS automatically — it uses `.air.toml` on Windows and `.air.linux.toml` on Linux/macOS.
+
 ## Development
 
 ### Project Structure
@@ -71,19 +74,21 @@ The application will be available at `http://localhost:8080` (or the port set in
 │   └── app.go         # Application setup and routing
 ├── build/             # Production binary output (not in git)
 ├── tmp/               # Dev build output (not in git)
-├── .air.toml          # Live reload configuration
+├── .air.toml          # Live reload config (Windows)
+├── .air.linux.toml    # Live reload config (Linux/macOS/devcontainer)
 └── package.json       # Frontend dependencies
 ```
 
 ### Available Commands
 
-- `make dev` - Start development server with live reload (runs air)
+- `make dev` - Start development server with live reload
 - `make build` - Build CSS, copy assets, and compile production binary
+- `make docker` - Build the production Docker image
 
 ### Adding New Features
 
 1. Create a new feature directory in `src/features/`
-2. Add `handler.go` and feature-specific templates
+2. Add a `.go` file with routes, handler, and page assembly
 3. Register routes in `src/app.go`
 4. Use components from `src/components/` or create feature-internal ones in the feature directory
 
@@ -100,7 +105,15 @@ Split into `handler.go` + `page.go` only if page assembly grows complex enough t
 
 ### Styling
 
-TailwindCSS classes are available throughout the application. Modify `src/styles/styles.css` to add custom styles or extend the configuration in `src/styles/config.css`.
+TailwindCSS classes are available throughout the application. Modify `src/static/styles/styles.css` to add custom styles.
+
+## Dev Container
+
+This project includes a [Dev Container](https://containers.dev/) configuration for a consistent, isolated development environment. It requires the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) and Docker Desktop.
+
+To use it: open the repo in VS Code and click **Reopen in Container** when prompted, or run `F1` → "Dev Containers: Reopen in Container".
+
+The container includes Go 1.26, Node 24, Air, and all project dependencies pre-installed. AWS credentials are passed in from host environment variables — no credential files are mounted.
 
 ## Production
 
@@ -112,6 +125,30 @@ make build
 ```
 
 The server binds to `0.0.0.0:<PORT>` (default `8080`), so it works in containers and behind reverse proxies. Set `PORT` via environment variable — no `.env` file is required in production.
+
+### Docker
+
+Build the image:
+
+```bash
+make docker
+```
+
+Run it:
+
+```bash
+docker run -p 8080:8080 ct-go-web-starter
+```
+
+Then open `http://localhost:8080`. `Ctrl+C` to stop — the server drains in-flight requests before exiting.
+
+To run on a different port:
+
+```bash
+docker run -p 9000:9000 -e PORT=9000 ct-go-web-starter
+```
+
+The image uses a three-stage build (Node → Go → distroless) producing a minimal runtime image with no shell or package manager. Environment variables are the only supported configuration mechanism — no `.env` file is used at runtime.
 
 ## License
 

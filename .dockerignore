@@ -1,0 +1,10 @@
+.git
+.claude
+.devcontainer
+node_modules
+tmp
+build
+*.log
+
+.env
+.env.*
