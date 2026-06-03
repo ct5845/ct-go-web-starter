@@ -4,5 +4,6 @@ dev:
 	air
 
 build:
-	go generate ./...
-	go build -o build/ .
+	npm run build-css
+	go run ./cmd/copyassets
+	go build -o build/ ./cmd/web

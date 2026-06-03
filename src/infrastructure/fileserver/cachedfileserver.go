@@ -1,7 +1,6 @@
 package fileserver
 
 import (
-	"compress/gzip"
 	"crypto/md5"
 	"fmt"
 	"io"
@@ -13,42 +12,17 @@ import (
 	"sync"
 )
 
+func RegisterRoutes(mux *http.ServeMux, dir string) {
+	cachedFS := NewCachedFileServer(dir)
+	mux.Handle("/static/", http.StripPrefix("/static/", cachedFS))
+	mux.Handle("GET /sw.js", http.StripPrefix("/", cachedFS))
+	mux.Handle("GET /robots.txt", http.StripPrefix("/", cachedFS))
+}
+
 type CachedFileServer struct {
 	dir   string
 	etags map[string]string
 	mutex sync.RWMutex
-}
-
-type gzipResponseWriter struct {
-	http.ResponseWriter
-	gzWriter  *gzip.Writer
-	etag      string
-	hasETag   bool
-	headerSet bool
-}
-
-func (rw *gzipResponseWriter) Write(b []byte) (int, error) {
-	if !rw.headerSet {
-		rw.WriteHeader(http.StatusOK)
-	}
-	return rw.gzWriter.Write(b)
-}
-
-func (rw *gzipResponseWriter) WriteHeader(statusCode int) {
-	if !rw.headerSet {
-		if rw.hasETag {
-			rw.Header().Set("ETag", rw.etag)
-		}
-		rw.Header().Set("Cache-Control", "public, no-cache, must-revalidate")
-		rw.Header().Set("Content-Encoding", "gzip")
-		rw.Header().Del("Content-Length")
-		rw.headerSet = true
-	}
-	rw.ResponseWriter.WriteHeader(statusCode)
-}
-
-func (rw *gzipResponseWriter) Close() error {
-	return rw.gzWriter.Close()
 }
 
 func NewCachedFileServer(dir string) *CachedFileServer {
@@ -116,30 +90,11 @@ func (cfs *CachedFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Check if client accepts gzip
-	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
-		gzWriter := gzip.NewWriter(w)
-		defer gzWriter.Close()
-
-		gzWrapped := &gzipResponseWriter{
-			ResponseWriter: w,
-			gzWriter:       gzWriter,
-			etag:           etag,
-			hasETag:        hasETag,
-		}
-
-		fileServer := http.FileServer(http.Dir(cfs.dir))
-		fileServer.ServeHTTP(gzWrapped, r)
-		return
-	}
-
-	// Fallback: serve without gzip
 	if hasETag {
 		w.Header().Set("ETag", etag)
 		w.Header().Set("Cache-Control", "public, no-cache, must-revalidate")
 	}
-	fileServer := http.FileServer(http.Dir(cfs.dir))
-	fileServer.ServeHTTP(w, r)
+	http.FileServer(http.Dir(cfs.dir)).ServeHTTP(w, r)
 }
 
 func (cfs *CachedFileServer) RefreshETags() {

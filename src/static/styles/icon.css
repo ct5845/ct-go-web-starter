@@ -1,0 +1,82 @@
+@layer base {
+  .icon {
+    font-variation-settings:
+      "FILL" var(--icon-fill, 0),
+      "wght" var(--icon-wght, 400),
+      "GRAD" var(--icon-grad, 0),
+      "opsz" var(--icon-opsz, 24);
+  }
+}
+
+@utility icon-fill-0 {
+  --icon-fill: 0;
+}
+@utility icon-fill-1 {
+  --icon-fill: 1;
+}
+
+@utility icon-wght-100 {
+  --icon-wght: 100;
+}
+@utility icon-wght-200 {
+  --icon-wght: 200;
+}
+@utility icon-wght-300 {
+  --icon-wght: 300;
+}
+@utility icon-wght-400 {
+  --icon-wght: 400;
+}
+@utility icon-wght-500 {
+  --icon-wght: 500;
+}
+@utility icon-wght-600 {
+  --icon-wght: 600;
+}
+@utility icon-wght-700 {
+  --icon-wght: 700;
+}
+@utility icon-wght-800 {
+  --icon-wght: 800;
+}
+
+@utility icon-grad-n25 {
+  --icon-grad: -25;
+}
+@utility icon-grad-0 {
+  --icon-grad: 0;
+}
+@utility icon-grad-200 {
+  --icon-grad: 200;
+}
+
+@utility icon-opsz-20 {
+  --icon-opsz: 20;
+}
+@utility icon-opsz-24 {
+  --icon-opsz: 24;
+}
+@utility icon-opsz-40 {
+  --icon-opsz: 40;
+}
+@utility icon-opsz-48 {
+  --icon-opsz: 48;
+}
+
+.icon {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  width: 1em;
+  height: 1em;
+}

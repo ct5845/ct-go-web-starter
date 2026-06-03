@@ -65,39 +65,17 @@ func WithJS(name, htmlTemplate, jsTemplate string) *component {
 	}
 }
 
-// props builds a map[string]any from key/value pairs, matching slog-style variadic args.
-// Panics if an odd number of args is passed, or if a key is not a string.
-func props(keysAndValues []any) map[string]any {
-	if len(keysAndValues) == 0 {
-		return nil
-	}
-	if len(keysAndValues)%2 != 0 {
-		panic(fmt.Sprintf("component: Render called with odd number of args (%d)", len(keysAndValues)))
-	}
-	m := make(map[string]any, len(keysAndValues)/2)
-	for i := 0; i < len(keysAndValues); i += 2 {
-		key, ok := keysAndValues[i].(string)
-		if !ok {
-			panic(fmt.Sprintf("component: key at index %d is not a string", i))
-		}
-		m[key] = keysAndValues[i+1]
-	}
-	return m
-}
-
-// Render executes the component template with the provided key/value pairs and returns the HTML.
-// Usage: comp.Render("Title", "Hello", "Count", 42)
-func (c *component) Render(keysAndValues ...any) (template.HTML, error) {
+func (c *component) Render(data any) (template.HTML, error) {
 	var buf bytes.Buffer
-	if err := c.template.Execute(&buf, props(keysAndValues)); err != nil {
+	if err := c.template.Execute(&buf, data); err != nil {
 		return "", fmt.Errorf("component %q: %w", c.name, err)
 	}
 	return template.HTML(buf.String()), nil
 }
 
 // MustRender executes the component template and panics on error (useful for compile-time safety)
-func (c *component) MustRender(keysAndValues ...any) template.HTML {
-	html, err := c.Render(keysAndValues...)
+func (c *component) MustRender(data any) template.HTML {
+	html, err := c.Render(data)
 	if err != nil {
 		panic(err)
 	}

@@ -24,8 +24,8 @@ Prefer clear, descriptive names for variables, functions, and types over short n
 `src/` has three top-level directories. Keep it that way — do not add new top-level directories without good reason.
 
 - `features/` — one subdirectory per user-facing feature (e.g. `features/home/`); features have an HTTP surface (handler + routes)
-- `components/` — UI building blocks with no HTTP surface (`components/component/`, `components/header/`, `components/footer/`, `components/page/`)
-- `infrastructure/` — platform and runtime concerns with no feature or UI logic (`infrastructure/fs/`, `infrastructure/fileserver/`, `infrastructure/config/`)
+- `components/` — UI building blocks with no HTTP surface (`components/component/`, `components/page/`, `components/icon/`, etc.)
+- `infrastructure/` — platform and runtime concerns with no feature or UI logic (`infrastructure/fileserver/`, `infrastructure/config/`, `infrastructure/compression/`)
 
 The rule for placement is simple: if it has a route, it's a feature. If it's a UI building block with no HTTP surface, it's a component. If it's a platform/runtime concern, it's infrastructure.
 
@@ -53,14 +53,9 @@ homeTmpl.Render("WelcomeCardHTML", welcomeCardHTML)
 ```
 
 
-When a feature handler has meaningful page assembly work (rendering subcomponents, preparing data), split it into two files:
+Simple features live in a single file (e.g. `home.go`) that contains the route registration, HTTP handler, and page assembly together. Only split into `handler.go` + `page.go` when there is substantial assembly work — multiple subcomponents, complex data preparation — that would make a single file unwieldy.
 
-- `handler.go` — HTTP only: validate the request, call `renderPage()`, write the response or error
-- `page.go` — UI assembly: embed templates, render subcomponents, compose and return the full page HTML
-
-Only split when there is real assembly work. A trivial handler with no subcomponents does not need a separate `page.go`.
-
-See `src/features/home/` for a working example of this pattern.
+See `src/features/home/home.go` for a working example of the single-file pattern.
 
 ## Language-Specific Guidelines
 

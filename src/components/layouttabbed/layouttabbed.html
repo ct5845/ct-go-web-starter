@@ -1,0 +1,12 @@
+<body class="min-h-full grid grid-rows-[auto_1fr_auto]">
+  <header class="sticky top-0 w-full">{{ .Header }}</header>
+
+  <main class="">{{ .Content }}</main>
+
+  <footer
+    class="sticky bottom-0 w-full"
+    style="padding-bottom: env(safe-area-inset-bottom)"
+  >
+    {{ .BottomTabs }}
+  </footer>
+</body>

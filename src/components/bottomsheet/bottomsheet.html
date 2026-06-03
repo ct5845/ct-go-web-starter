@@ -1,0 +1,17 @@
+<dialog
+  closedby="any"
+  id="{{ .Id }}"
+  class="fixed bottom-0 top-auto w-full max-w-full max-h-[75vh] p-0 border-none rounded-t-2xl overflow-hidden translate-y-full open:translate-y-0 transition-[translate] duration-300 ease-in-out bg-surface-bright backdrop:bg-scrim/50"
+>
+  <header class="p-4 pb-0 flex justify-end">
+    <button
+      class="flex items-center gap-2"
+      command="close"
+      commandfor="{{ .Id }}"
+    >
+      Close
+      <span class="icon">close</span>
+    </button>
+  </header>
+  <div class="flex flex-col max-h-[75vh] overflow-y-auto">{{ .Content }}</div>
+</dialog>

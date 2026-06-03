@@ -2,27 +2,22 @@ package src
 
 import (
 	"ct-go-web-starter/src/features/home"
+	"ct-go-web-starter/src/infrastructure/compression"
 	"ct-go-web-starter/src/infrastructure/fileserver"
+	_ "embed"
 	"log"
 	"log/slog"
 	"net/http"
 )
 
 func App() {
-	// Routes
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", home.Handler)
 
-	// Handle Chrome DevTools well-known endpoint to keep logs clean
-	mux.HandleFunc("/.well-known/appspecific/com.chrome.devtools.json", func(w http.ResponseWriter, r *http.Request) {
-		http.NotFound(w, r)
-	})
+	home.RegisterRoutes(mux)
+	fileserver.RegisterRoutes(mux, "tmp/static/")
 
-	// Static files with ETag caching
-	cachedFS := fileserver.NewCachedFileServer("tmp/static/")
-	mux.Handle("/static/", http.StripPrefix("/static/", cachedFS))
-	mux.Handle("GET /sw.js", http.StripPrefix("/", cachedFS))
+	mux.HandleFunc("/.well-known/appspecific/com.chrome.devtools.json", http.NotFound)
 
 	slog.Info("Server starting on http://localhost:8080")
-	log.Fatal(http.ListenAndServe("localhost:8080", mux))
+	log.Fatal(http.ListenAndServe("localhost:8080", compression.Handler(mux)))
 }

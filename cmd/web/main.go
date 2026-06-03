@@ -7,9 +7,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//go:generate npm run build-css
-//go:generate go run src/infrastructure/copyassets/copyassets.go
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {

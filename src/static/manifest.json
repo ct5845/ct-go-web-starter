@@ -1,6 +1,6 @@
 {
   "name": "ct-go-web-starter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "short_name": "ct-go",
   "display": "standalone",
   "background_color": "#ffffff",
