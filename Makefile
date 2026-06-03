@@ -15,4 +15,5 @@ build:
 	go build -o build/ ./cmd/web
 
 docker:
-	docker build -t ct-go-web-starter .
+	docker build -f cmd/web/Dockerfile -t ct-go-web-starter .
+	docker image prune -f
