@@ -41,14 +41,14 @@ A modern Go web application starter template with HTMX, Alpine.js, and TailwindC
    cp .env.example .env
    ```
 
-4. Run the development server:
+4. Run the web development server:
    ```bash
-   make dev
+   make web
    ```
 
 The application will be available at `http://localhost:8080` (or the port set in `PORT`).
 
-> `make dev` detects the OS automatically — it uses `.air.toml` on Windows and `.air.linux.toml` on Linux/macOS.
+> `make web` detects the OS automatically — it uses `.air.windows.toml` on Windows and `.air.linux.toml` on Linux/macOS.
 
 ## Development
 
@@ -81,7 +81,7 @@ The application will be available at `http://localhost:8080` (or the port set in
 
 ### Available Commands
 
-- `make dev` - Start development server with live reload
+- `make web` - Start web development server with live reload
 - `make build` - Build CSS, copy assets, and compile production binary
 - `make docker` - Build the production Docker image
 

@@ -1,4 +1,4 @@
-.PHONY: dev build docker
+.PHONY: web build docker
 
 ifeq ($(OS),Windows_NT)
   AIR_CONF = .air.windows.toml
@@ -6,7 +6,7 @@ else
   AIR_CONF = .air.linux.toml
 endif
 
-dev:
+web:
 	air -c $(AIR_CONF)
 
 build:
