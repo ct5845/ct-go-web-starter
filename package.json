@@ -2,7 +2,7 @@
   "name": "ct-go-web-starter",
   "private": true,
   "scripts": {
-    "build-css": "tailwindcss -i ./src/static/styles/styles.css -o ./tmp/static/style.css --minify"
+    "build-css": "npx tailwindcss -i ./src/static/styles/styles.css -o ./tmp/static/style.css --minify"
   },
   "devDependencies": {
     "@tailwindcss/cli": "4.3.0",
