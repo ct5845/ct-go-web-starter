@@ -31,36 +31,11 @@ The rule for placement is simple: if it has a route, it's a feature. If it's a U
 
 Feature-internal components (used only within one feature) live in the feature directory and are unexported. Components used across features live in `src/components/`.
 
-## Components and Templates
-
-Each component is a `.go` file + `.html` file pair, optionally with a `.js` file when using `component.WithJS`. Use `//go:embed` to embed the HTML at compile time.
-
-All data preparation happens in Go. Do not use template functions for logic. If a template needs data, compute it in Go and pass it as a named prop. Templates are for rendering only.
-
-Subcomponents are rendered in Go first, then passed to the parent template as `template.HTML` props. Never render a component from inside another template — compose in Go, not in HTML.
-
-```
-// render the subcomponent in Go
-welcomeCardHTML, err := renderWelcomeCard("Title", "Description")
-
-// pass it as a prop to the parent
-homeTmpl.Render("WelcomeCardHTML", welcomeCardHTML)
-```
-
-```html
-<!-- parent template receives it as a plain prop -->
-{{ .WelcomeCardHTML }}
-```
-
-
-Simple features live in a single file (e.g. `home.go`) that contains the route registration, HTTP handler, and page assembly together. Only split into `handler.go` + `page.go` when there is substantial assembly work — multiple subcomponents, complex data preparation — that would make a single file unwieldy.
-
-See `src/features/home/home.go` for a working example of the single-file pattern.
-
 ## Language-Specific Guidelines
 
 - Go: see [agents/golang.md](agents/golang.md)
 - HTML: see [agents/html.md](agents/html.md)
+- JavaScript: see [agents/js.md](agents/js.md)
 
 ## Testing
 
