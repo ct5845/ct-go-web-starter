@@ -1,0 +1,42 @@
+@layer base {
+  meter {
+    background: none;
+    @apply h-4 rounded-full bg-container-highest;
+  }
+
+  meter::-webkit-meter-bar {
+    background: none;
+    @apply rounded-full bg-container-highest;
+  }
+
+  meter::-webkit-meter-optimum-value,
+  meter::-webkit-meter-suboptimum-value,
+  meter::-webkit-meter-even-less-good-value {
+    background-image: none;
+    @apply h-6 rounded-full;
+  }
+
+  meter::-webkit-meter-optimum-value {
+    @apply bg-primary;
+  }
+
+  meter::-webkit-meter-suboptimum-value {
+    @apply bg-tertiary;
+  }
+
+  meter::-webkit-meter-even-less-good-value {
+    @apply bg-tertiary;
+  }
+
+  meter::-moz-meter-bar {
+    @apply rounded-full bg-primary;
+  }
+
+  meter:-moz-meter-sub-optimum::-moz-meter-bar {
+    @apply bg-tertiary;
+  }
+
+  meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    @apply bg-error;
+  }
+}

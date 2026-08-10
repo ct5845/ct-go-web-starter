@@ -1,0 +1,120 @@
+<div id="{{ .ID }}">
+  <div
+    id="{{ .ResultsID }}"
+    hx-boost="true"
+    hx-target="#{{ .ResultsID }}"
+    hx-select="#{{ .ResultsID }}"
+    hx-push-url="true"
+  >
+    {{ if .SearchEnabled }}
+    <div class="hidden md:block container mx-auto ptc-2 pxc-4">
+      <div
+        class="rounded-2xl border-b border-outline bg-inverse-surface text-on-inverse-surface flex gap-2 items-center pc-2"
+      >
+        <span aria-hidden="true" class="icon opacity-75 icon-opsz-20">search</span>
+        <input
+          id="{{ .ID }}-search-top"
+          hx-preserve="true"
+          type="search"
+          autocomplete="off"
+          name="q"
+          value="{{ .SearchQuery }}"
+          placeholder="{{ .Placeholder }}"
+          aria-label="{{ .Placeholder }}"
+          class="text-sm grow outline-none bg-transparent"
+          hx-get="{{ .BaseHref }}"
+          hx-trigger="input changed delay:300ms, search"
+          hx-target="#{{ .ResultsID }}"
+          hx-select="#{{ .ResultsID }}"
+          hx-push-url="true"
+        />
+      </div>
+    </div>
+    {{ end }}
+    <div class="container mx-auto pxc-4 pyc-2">
+      <ul class="menu">
+        {{ range .Items }}
+        <li class="menu-item">{{ . }}</li>
+        {{ end }}
+      </ul>
+    </div>
+    <div
+      class="sticky md:relative z-10 container mx-auto pxc-4 pbc-2"
+      style="bottom: calc(var(--footer-height, 0px))"
+    >
+      {{ if .SearchEnabled }}
+      <div class="container mx-auto md:hidden">
+        <div
+          class="rounded-t-2xl border-b border-outline bg-inverse-surface text-on-inverse-surface flex gap-2 items-center pc-2"
+        >
+          <span class="icon opacity-75 icon-opsz-20">search</span>
+          <input
+            id="{{ .ID }}-search-bottom"
+            hx-preserve="true"
+            type="search"
+            autocomplete="off"
+            name="q"
+            value="{{ .SearchQuery }}"
+            placeholder="{{ .Placeholder }}"
+            aria-label="{{ .Placeholder }}"
+            class="text-sm grow outline-none bg-transparent"
+            hx-get="{{ .BaseHref }}"
+            hx-trigger="input changed delay:300ms, search"
+            hx-target="#{{ .ResultsID }}"
+            hx-select="#{{ .ResultsID }}"
+            hx-push-url="true"
+          />
+        </div>
+      </div>
+      {{ end }}
+      <nav
+        class="rounded-b-2xl bg-inverse-surface text-on-inverse-surface flex items-center gap-2 md:rounded-t-2xl"
+        aria-label="Pagination"
+      >
+        {{ if .HasPrev }}
+        <a aria-label="Go to first page" class="btn" href="{{ .FirstHref }}"
+          ><span aria-hidden="true" class="icon icon-opsz-20"
+            >first_page</span
+          ></a
+        >
+        <a aria-label="Go to previous page" class="btn" href="{{ .PrevHref }}"
+          ><span aria-hidden="true" class="icon icon-opsz-20"
+            >chevron_left</span
+          ></a
+        >
+        {{ else }}
+        <button aria-label="Go to first page" class="btn" disabled>
+          <span aria-hidden="true" class="icon icon-opsz-20">first_page</span>
+        </button>
+        <button aria-label="Go to previous page" class="btn" disabled>
+          <span aria-hidden="true" class="icon icon-opsz-20">chevron_left</span>
+        </button>
+        {{ end }}
+        <span class="text-xs grow text-center truncate" aria-live="polite"
+          >Page {{ .Page }} of {{ .TotalPages }}</span
+        >
+        {{ if .HasNext }}
+        <a aria-label="Go to next page" class="btn" href="{{ .NextHref }}"
+          ><span aria-hidden="true" class="icon icon-opsz-20"
+            >chevron_right</span
+          ></a
+        >
+        <a aria-label="Go to last page" class="btn" href="{{ .LastHref }}"
+          ><span aria-hidden="true" class="icon icon-opsz-20"
+            >last_page</span
+          ></a
+        >
+        {{ else }}
+        <button aria-label="Go to next page" class="btn" disabled>
+          <span aria-hidden="true" class="icon icon-opsz-20"
+            >chevron_right</span
+          >
+        </button>
+        <button aria-label="Go to last page" class="btn" disabled>
+          <span aria-hidden="true" class="icon icon-opsz-20">last_page</span>
+        </button>
+        {{ end }}
+      </nav>
+    </div>
+  </div>
+</div>

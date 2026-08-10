@@ -8,19 +8,16 @@ import (
 
 var (
 	//go:embed bottomsheet.html
-	bottomSheetHTML string
-	comp            = component.New("bottomsheet.html", bottomSheetHTML)
+	bottomsheetHTML string
+	bottomsheetTpl  = component.New("bottomsheet.html", bottomsheetHTML)
 )
 
 type Options struct {
 	Id      string
 	Content template.HTML
+	Label   string
 }
 
 func Render(options Options) (template.HTML, error) {
-	return comp.Render(options)
-}
-
-func MustRender(options Options) template.HTML {
-	return comp.MustRender(options)
+	return bottomsheetTpl.Render(options)
 }

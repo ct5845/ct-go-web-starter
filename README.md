@@ -41,7 +41,12 @@ A modern Go web application starter template with HTMX, Alpine.js, and TailwindC
    cp .env.example .env
    ```
 
-4. Run the web development server:
+4. Enable the repository git hooks (runs `gofmt` before each commit):
+   ```bash
+   git config core.hooksPath .githooks
+   ```
+
+5. Run the web development server:
    ```bash
    make web
    ```
@@ -56,22 +61,30 @@ The application will be available at `http://localhost:8080` (or the port set in
 
 ```
 ├── cmd/
-│   ├── web/           # Main entrypoint (starts the server)
+│   ├── web/           # Main entrypoint (starts the server, wires up routes)
 │   └── copyassets/    # Build tool: copies static assets and JS deps to tmp/
 ├── src/
 │   ├── features/      # Features with HTTP surface (routes + handlers)
-│   │   └── home/      # Home page feature
-│   │       ├── home.go    # Handler, routes, and page assembly
-│   │       └── home.html  # Feature template
+│   │   ├── home/      # Home page feature
+│   │   │   ├── home.go    # Handler, routes, and page assembly
+│   │   │   └── home.html  # Feature template
+│   │   ├── optiona/   # Demo feature: paginated, searchable list
+│   │   └── nav/       # Shared navigation (bottom tabs, sidebar, more sheet)
 │   ├── components/    # UI building blocks with no HTTP surface
-│   │   ├── component/ # Component engine (New, Render, WithJS)
-│   │   └── page/      # Full page shell template
+│   │   ├── component/ # Component engine (New, Render, WithAlpine, WithIIFE)
+│   │   ├── page/      # Full page shell template
+│   │   ├── layoutswitch/ # Sidebar on desktop, bottom tabs on mobile
+│   │   ├── layoutfull/   # Full-bleed layout with no chrome
+│   │   ├── sidebar/      # Desktop navigation sidebar
+│   │   ├── bottomtabs/   # Mobile bottom tab bar
+│   │   ├── bottomsheet/  # Modal bottom sheet dialog
+│   │   ├── pagedlist/    # Paginated list with htmx-driven search
+│   │   └── icon/         # Icon font subsetting and inline SVGs
 │   ├── infrastructure/ # Platform and runtime concerns
 │   │   ├── config/    # Configuration and logging
 │   │   ├── compression/ # HTTP response compression
 │   │   └── fileserver/ # Static file serving with caching
-│   ├── static/        # Static assets (favicon, images, etc.)
-│   └── app.go         # Application setup and routing
+│   └── static/        # Static assets (favicon, images, etc.)
 ├── build/             # Production binary output (not in git)
 ├── tmp/               # Dev build output (not in git)
 ├── .air.toml          # Live reload config (Windows)
@@ -89,7 +102,7 @@ The application will be available at `http://localhost:8080` (or the port set in
 
 1. Create a new feature directory in `src/features/`
 2. Add a `.go` file with routes, handler, and page assembly
-3. Register routes in `src/app.go`
+3. Expose `RegisterRoutes(mux *http.ServeMux)` from the feature, and call it from `routes()` in `cmd/web/main.go`
 4. Use components from `src/components/` or create feature-internal ones in the feature directory
 
 **Example: Adding a "blog" feature**

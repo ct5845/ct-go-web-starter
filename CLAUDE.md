@@ -41,6 +41,10 @@ Feature-internal components (used only within one feature) live in the feature d
 
 Do not write tests by default. Add a test when there is a genuine reason: the function has multiple edge cases that are non-obvious, the output is hard to verify through normal use, or a bug has been fixed and regression coverage is valuable. Do not test functions simply to confirm they work — if the behaviour is obvious and a manual run through the app would surface any breakage, a test adds noise without value. When tests are warranted, use table-driven tests for functions with multiple input/output cases.
 
+## Verifying Changes
+
+Do not launch the web server (`go run ./cmd/web`) to verify a change. A dev instance is normally already running on the default port; a second `go run` will either fail to bind or fight over it. Verify with `go build ./...` / `go vet ./...`, and ask the user to check the running instance for anything that needs visual or browser confirmation.
+
 ## Keep It Simple
 
 Do not over-engineer. Solve the problem at hand. Do not add configuration, flags, or extension points for requirements that do not yet exist. The right amount of complexity is the minimum needed for the current task.

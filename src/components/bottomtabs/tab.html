@@ -1,0 +1,8 @@
+{{ if .Href }}
+<a href="{{ .Href }}" {{ .Attrs }} class="{{ .Class }}">
+{{ else }}
+<button {{ .Attrs }} class="{{ .Class }}">
+{{ end }}
+  <span aria-hidden="true" class="icon {{ .IconClass }}">{{ .Icon }}</span>
+  <span class="{{ .LabelClass }}">{{ .Label }}</span>
+{{ if .Href }}</a>{{ else }}</button>{{ end }}

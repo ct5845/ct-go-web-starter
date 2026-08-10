@@ -2,6 +2,37 @@
   --font-sans: ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Fraunces", "Fraunces Fallback", "Georgia", serif;
   --font-mono: ui-monospace, "Cascadia Code", monospace;
+
+  /* Fluid type scaling window. Each size grows from its min (at --fluid-min-vw)
+     to its max (at --fluid-max-vw). Lower --fluid-max-vw to make text reach full
+     size earlier/quicker; raise it to scale more gradually. --fluid-progress is
+     0 at the min viewport and 1 at the max viewport, clamped 0..1. */
+  --fluid-min-vw: 30rem; /* 480px */
+  --fluid-max-vw: 80rem; /* 1280px */
+  --fluid-progress: clamp(
+    0,
+    (100vw - var(--fluid-min-vw)) / (var(--fluid-max-vw) - var(--fluid-min-vw)),
+    1
+  );
+
+  /* min values form a geometric ramp anchored at base=1rem and 7xl=3.5rem;
+     max values are the desktop sizes. */
+  --text-2xs: calc(0.625rem + (0.75 - 0.625) * 1rem * var(--fluid-progress));
+  --text-xs: calc(0.731rem + (0.9375 - 0.731) * 1rem * var(--fluid-progress));
+  --text-sm: calc(0.855rem + (1.0938 - 0.855) * 1rem * var(--fluid-progress));
+  --text-base: calc(1rem + (1.25 - 1) * 1rem * var(--fluid-progress));
+  --text-lg: calc(1.17rem + (1.4063 - 1.17) * 1rem * var(--fluid-progress));
+  --text-xl: calc(1.368rem + (1.5625 - 1.368) * 1rem * var(--fluid-progress));
+  --text-2xl: calc(1.6rem + (1.875 - 1.6) * 1rem * var(--fluid-progress));
+  --text-3xl: calc(1.871rem + (2.3438 - 1.871) * 1rem * var(--fluid-progress));
+  --text-4xl: calc(2.188rem + (2.8125 - 2.188) * 1rem * var(--fluid-progress));
+  --text-5xl: calc(2.559rem + (3.75 - 2.559) * 1rem * var(--fluid-progress));
+  --text-6xl: calc(2.993rem + (4.6875 - 2.993) * 1rem * var(--fluid-progress));
+  --text-7xl: calc(3.5rem + (5.625 - 3.5) * 1rem * var(--fluid-progress));
+  --text-8xl: calc(4.093rem + (7.5 - 4.093) * 1rem * var(--fluid-progress));
+  --text-9xl: calc(4.787rem + (10 - 4.787) * 1rem * var(--fluid-progress));
+
+  --text-2xs--line-height: 1.5;
 }
 
 @font-face {
@@ -15,38 +46,39 @@
 
 @layer base {
   body {
+    font-size: var(--text-base);
     font-family: var(--font-serif);
-    font-size: var(--text-lg);
     font-weight: var(--font-weight-normal);
-    line-height: var(--leading-loose);
+    line-height: var(--leading-normal);
     letter-spacing: var(--tracking-wide);
+    overflow-wrap: break-word;
   }
 
   h1 {
-    font-size: var(--text-8xl);
+    font-size: var(--text-5xl);
     font-weight: var(--font-weight-extrabold);
-    line-height: var(--leading-tight);
+    line-height: var(--text-5xl--line-height);
     letter-spacing: var(--tracking-tight);
   }
 
   h2 {
-    font-size: var(--text-6xl);
+    font-size: var(--text-4xl);
     font-weight: var(--font-weight-bold);
-    line-height: var(--leading-tight);
+    line-height: var(--leading-4xl--line-height);
     letter-spacing: var(--tracking-wide);
   }
 
   h3 {
     font-size: var(--text-2xl);
-    font-weight: var(--font-weight-semibold);
-    line-height: var(--leading-snug);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--leading-2xl--line-height);
     letter-spacing: var(--tracking-wide);
   }
 
   h4 {
     font-size: var(--text-xl);
     font-weight: var(--font-weight-medium);
-    line-height: var(--leading-snug);
+    line-height: var(--leading-xl--line-height);
     letter-spacing: var(--tracking-wide);
   }
 
@@ -69,5 +101,34 @@
   kbd {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
+  }
+
+  pre {
+    @apply bg-container-lowest text-on-surface border border-outline-variant rounded-md p-2 max-w-full overflow-x-auto;
+
+    code {
+      @apply px-0 bg-transparent;
+    }
+  }
+
+  blockquote {
+    @apply bg-container-lowest border border-outline-variant border-l-4 border-l-secondary rounded-md p-2 max-w-full;
+
+    blockquote {
+      @apply shadow-md mt-2;
+    }
+  }
+
+  hr {
+    @apply text-outline-variant;
+  }
+
+  code {
+    @apply bg-container-high text-on-surface rounded-md px-1;
+    overflow-wrap: break-word;
+  }
+
+  textarea {
+    line-height: var(--leading-tight);
   }
 }

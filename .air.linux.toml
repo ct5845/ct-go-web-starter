@@ -4,18 +4,18 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  entrypoint = "./tmp/web"
+  bin = "./tmp/web"
   pre_cmd = ["npm run build-css", "go run ./cmd/copyassets"]
   cmd = "go build -o ./tmp/web ./cmd/web"
-  delay = 0
+  delay = 200
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules", "build", ".claude", "agents", "scripts"]
   exclude_file = []
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
-  follow_symlinks = false
+  follow_symlink = false
   full_bin = ""
   include_dir = ["src", "cmd/web"]
-  include_ext = ["go", "js", "html", "css"]
+  include_ext = ["go", "js", "html", "css", "svg"]
   include_file = []
   kill_delay = "0s"
   log = "build-errors.log"
@@ -24,7 +24,7 @@ tmp_dir = "tmp"
   rerun = false
   rerun_delay = 500
   send_interrupt = false
-  stop_on_root = false
+  stop_on_error = true
 
 [color]
   app = ""

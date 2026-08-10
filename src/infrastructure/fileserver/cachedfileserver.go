@@ -25,15 +25,17 @@ func RegisterRoutes(mux *http.ServeMux, dir string) {
 }
 
 type CachedFileServer struct {
-	dir   string
-	etags map[string]string
-	mutex sync.RWMutex
+	dir        string
+	fileServer http.Handler
+	etags      map[string]string
+	mutex      sync.RWMutex
 }
 
 func NewCachedFileServer(dir string) *CachedFileServer {
 	cfs := &CachedFileServer{
-		dir:   dir,
-		etags: make(map[string]string),
+		dir:        dir,
+		fileServer: http.FileServer(http.Dir(dir)),
+		etags:      make(map[string]string),
 	}
 	cfs.buildETags()
 	return cfs
@@ -87,21 +89,12 @@ func (cfs *CachedFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cfs.mutex.RUnlock()
 
 	if hasETag {
-		// Handle If-None-Match header
-		if match := r.Header.Get("If-None-Match"); match == etag {
-			w.Header().Set("ETag", etag)
+		w.Header().Set("ETag", etag)
+		if r.Header.Get("If-None-Match") == etag {
 			w.WriteHeader(http.StatusNotModified)
 			return
 		}
-	}
-
-	if hasETag {
-		w.Header().Set("ETag", etag)
 		w.Header().Set("Cache-Control", "public, no-cache, must-revalidate")
 	}
-	http.FileServer(http.Dir(cfs.dir)).ServeHTTP(w, r)
-}
-
-func (cfs *CachedFileServer) RefreshETags() {
-	cfs.buildETags()
+	cfs.fileServer.ServeHTTP(w, r)
 }

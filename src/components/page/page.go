@@ -3,6 +3,7 @@ package page
 import (
 	"ct-go-web-starter/src/components/component"
 	"ct-go-web-starter/src/components/icon"
+	"ct-go-web-starter/src/infrastructure/config"
 	_ "embed"
 	"html/template"
 )
@@ -20,10 +21,12 @@ type Options struct {
 	OGImageURL      string
 	FaviconURL      string
 	Body            template.HTML
+	IsDev           bool
 }
 
 func Render(options Options) (template.HTML, error) {
 	options.IconsHref = icon.IconFontHref
+	options.IsDev = config.AppEnv == "dev"
 
 	return comp.Render(options)
 }

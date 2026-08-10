@@ -22,5 +22,6 @@ func createBottomSheet(activeTab string) (template.HTML, error) {
 	return bottomsheet.Render(bottomsheet.Options{
 		Id:      moreSheetID,
 		Content: content,
+		Label:   "Site navigation",
 	})
 }
