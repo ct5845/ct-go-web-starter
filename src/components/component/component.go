@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	texttemplate "text/template"
-
-	_ "ct-go-web-starter/src/infrastructure/config"
 )
 
 type component struct {
@@ -27,9 +25,9 @@ func New(name, htmlTemplate string) *component {
 	}
 }
 
-// WithJS creates a component with both HTML and JavaScript templates.
-// The JS template uses <<< >>> delimiters to avoid conflicts with Go/Alpine templates.
-func WithJS(name, htmlTemplate, jsTemplate string) *component {
+// withScript creates a component with both HTML and JavaScript templates.
+// The JS template uses <<< >>> delimiters to avoid conflicts with Go/JavaScript templates.
+func withScript(name, htmlTemplate, jsTemplate string) *component {
 	var scriptTmpl *texttemplate.Template
 	if jsTemplate != "" {
 		var err error
@@ -65,19 +63,29 @@ func WithJS(name, htmlTemplate, jsTemplate string) *component {
 	}
 }
 
+// WithIIFE wraps the JS template in an immediately-invoked function expression,
+// keeping its declarations out of the global scope.
+func WithIIFE(name, htmlTemplate, jsTemplate string) *component {
+	wrappedJS := fmt.Sprintf(`(function() {
+%s
+})();`, jsTemplate)
+	return withScript(name, htmlTemplate, wrappedJS)
+}
+
+// WithAlpine defers the JS template until the alpine:init event, so it can
+// register Alpine stores and data components.
+func WithAlpine(name, htmlTemplate, jsTemplate string) *component {
+	alpineWrapper := fmt.Sprintf(`document.addEventListener("alpine:init", () => {
+			%s
+		});
+	`, jsTemplate)
+	return withScript(name, htmlTemplate, alpineWrapper)
+}
+
 func (c *component) Render(data any) (template.HTML, error) {
 	var buf bytes.Buffer
 	if err := c.template.Execute(&buf, data); err != nil {
 		return "", fmt.Errorf("component %q: %w", c.name, err)
 	}
 	return template.HTML(buf.String()), nil
-}
-
-// MustRender executes the component template and panics on error (useful for compile-time safety)
-func (c *component) MustRender(data any) template.HTML {
-	html, err := c.Render(data)
-	if err != nil {
-		panic(err)
-	}
-	return html
 }

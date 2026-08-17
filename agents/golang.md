@@ -2,7 +2,7 @@
 
 ## Idioms and Standard Library
 
-Write idiomatic Go. Follow standard Go conventions for naming, error handling, and package organisation. Before reaching for a third-party library, ask whether the standard library (`net/http`, `encoding/json`, `html/template`, etc.) covers the need. Add a dependency only when it provides significant, non-trivial value over stdlib.
+Write idiomatic Go. Follow standard Go conventions for naming, error handling, and package organisation. Before reaching for a third-party library, ask whether the standard library (`net/http`, `encoding/json`, `html/template`, etc.) covers the need. Modules maintained by the Go team (`golang.org/x/...`) count as stdlib for this purpose — use them freely. Add any other dependency only when it provides significant, non-trivial value over stdlib.
 
 File names use lowercase with no hyphens — concatenate words directly (e.g. `welcomecard.go`, not `welcome-card.go`). Underscores are reserved for test files (`foo_test.go`) and platform-specific build files (`foo_windows.go`).
 
@@ -22,6 +22,14 @@ Do not create `utils`, `helpers`, `types`, or `models` packages. Name packages b
 
 Before writing new helper code, check whether a package already exists in `src/` that covers the need. Reuse it rather than duplicating locally.
 
+## Comments
+
+Comment the *why*, never the *what*. A comment that restates what the code plainly does (`// Get returns the override for domain`, `// loadGob decodes the file`) is noise — it makes code harder to scan and goes stale. Delete it and let the name and signature carry the meaning.
+
+Keep a comment only when it captures something the code cannot: a constraint (`// field order must match for gob decoding`), a non-obvious rationale (`// clearing primary also clears secondary`), an external quirk, or a deliberate trade-off. If you're tempted to explain what a function does, rename it instead.
+
+Doc comments on exported identifiers are worth keeping when they add information beyond the name, but hold them to the same bar — one line that says something the signature doesn't, not a paragraph restating it.
+
 ## Prefer Functions Over Methods
 
 Prefer package-level functions over methods on structs where there is no meaningful state to encapsulate. A struct with no real state that exists only to hang methods off is an unnecessary indirection — use a plain function instead. Use structs and methods when the type genuinely owns state that needs to travel with behaviour.
@@ -38,14 +46,52 @@ Panic only for unrecoverable programmer errors at initialisation time (e.g. a te
 
 Log meaningful events at appropriate levels. Avoid noisy debug logs that restate what the function name already says. Log at `slog.Info` for significant lifecycle events, `slog.Warn` for unexpected-but-recoverable situations, and `slog.Error` when something fails. Include relevant structured fields, not prose descriptions of the code path.
 
+## Request Tracking
+
+Every operation that does real work on a web request must be wrapped in a `reqlog.Track` span, so the request log shows *where* time goes — not just that a request was slow. Use the deferred form at the top of the scope:
+
+```go
+func handleGet(w http.ResponseWriter, r *http.Request) {
+	defer reqlog.Track(r.Context(), "home.handleGet", "")()
+	// ...
+}
+```
+
+Add a span to:
+
+- every HTTP handler (keyed `feature.handlerName`);
+- every call that crosses an I/O boundary — a database query, an external HTTP call — keyed by the operation. When one logical operation makes several round-trips, track each phase separately so the slow one is visible rather than hidden inside an aggregate.
+
+Pure in-memory work does not need a span. The test is: if this could plausibly be the slow part of a request, it must be trackable in isolation. `Track` is a no-op when the context carries no request, so it is safe to add anywhere.
+
+For streaming responses, where a long wall-clock time is expected rather than a problem, call `reqlog.IgnoreDuration(r.Context())` so the entry is not promoted to Warn.
+
 ## Routing
 
-All routes are registered in `src/app.go` using `http.NewServeMux()` from the standard library. Do not introduce a third-party router. Each feature exposes a single handler function (e.g. `home.Handler`) which is registered directly on the mux. Do not create a separate router file or a route registration abstraction — just add the `mux.HandleFunc` call in `App()`.
+All routes are wired up in `routes()` in `cmd/web/main.go`, using `http.NewServeMux()` from the standard library. Do not introduce a third-party router.
+
+Each feature exposes a single `RegisterRoutes(mux *http.ServeMux)` function that registers its own patterns, and `routes()` calls it:
+
+```go
+func routes() *http.ServeMux {
+	mux := http.NewServeMux()
+
+	home.RegisterRoutes(mux)
+	showcase.RegisterRoutes(mux)
+	fileserver.RegisterRoutes(mux, "tmp/static/")
+
+	return mux
+}
+```
+
+Keeping the patterns inside the feature means a route and its handler stay in one place. Do not create a separate router file or a route registration abstraction beyond this — just add the `RegisterRoutes` call in `routes()`.
 
 
 ## Components and Templates
 
-Each component is a `.go` file + `.html` file pair, optionally with a `.js` file when using `component.WithJS`. Use `//go:embed` to embed the HTML at compile time.
+Each component is a `.go` file + `.html` file pair, optionally with a `.js` file when using `component.WithAlpine` or `component.WithIIFE`. Use `//go:embed` to embed the HTML at compile time.
+
+Pick the wrapper by what the script needs: `WithAlpine` defers the script to the `alpine:init` event, so it can register Alpine stores and data components; `WithIIFE` wraps it in an immediately-invoked function expression, keeping plain DOM scripting out of the global scope.
 
 All data preparation happens in Go. Do not use template functions for logic. If a template needs data, compute it in Go and pass it as a named prop. Templates are for rendering only.
 
@@ -65,14 +111,9 @@ homeTmpl.Render("WelcomeCardHTML", welcomeCardHTML)
 ```
 
 
-When a feature handler has meaningful page assembly work (rendering subcomponents, preparing data), split it into two files:
+Simple features live in a single file (e.g. `home.go`) that contains the route registration, HTTP handler, and page assembly together. Only split into `handler.go` + `page.go` when there is substantial assembly work — multiple subcomponents, complex data preparation — that would make a single file unwieldy.
 
-- `handler.go` — HTTP only: validate the request, call `renderPage()`, write the response or error
-- `page.go` — UI assembly: embed templates, render subcomponents, compose and return the full page HTML
-
-Only split when there is real assembly work. A trivial handler with no subcomponents does not need a separate `page.go`.
-
-See `src/features/home/` for a working example of this pattern.
+See `src/features/home/home.go` for a working example of the single-file pattern.
 
 ## Component APIs
 
@@ -122,6 +163,9 @@ If the same composed result appears in many places, store it as a value
 and reuse the value — don't push the variation into the component.
 
 ```go
-// memberBottomTabs is computed once and reused across handlers.
-var memberBottomTabs = bottomtabs.MustRender(bottomtabs.Options{...})
+// primaryItems is declared once and projected into both the bottom tabs and
+// the sidebar, so the two navigations cannot drift apart.
+var primaryItems = []primaryItem{...}
 ```
+
+See `src/features/nav/homenav.go` for this pattern in use.

@@ -1,0 +1,9 @@
+<nav
+  x-data="{}"
+  aria-label="Primary"
+  class="flex h-full flex-col gap-1 bg-container-lowest pc-2"
+>
+  {{ .Header }}
+  <div class="grow">{{ range .Groups }}{{ . }}{{ end }}</div>
+  {{ .Footer }}
+</nav>

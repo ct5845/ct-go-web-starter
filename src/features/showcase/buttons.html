@@ -1,0 +1,60 @@
+<section class="container mx-auto pxc-4 pyc-3 flex flex-col gapc-4">
+  <div class="flex flex-col gap-2">
+    <h4>Variants</h4>
+    <div class="flex flex-wrap gap-2 items-center">
+      <button class="btn">btn</button>
+      <button class="btn-primary">btn-primary</button>
+      <button class="btn-secondary">btn-secondary</button>
+      <button class="btn-tertiary">btn-tertiary</button>
+      <button class="btn-outline">btn-outline</button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <h4>With icons</h4>
+    <div class="flex flex-wrap gap-2 items-center">
+      <button class="btn-primary">
+        <span aria-hidden="true" class="icon icon-opsz-20">search</span>
+        Leading icon
+      </button>
+      <button class="btn-outline">
+        Trailing icon
+        <span aria-hidden="true" class="icon icon-opsz-20"
+          >keyboard_arrow_right</span
+        >
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <h4>Icon only</h4>
+    <p class="text-on-surface-variant text-sm">
+      <code>btn-icon</code> squares the button. These always need an
+      <code>aria-label</code>.
+    </p>
+    <div class="flex flex-wrap gap-2 items-center">
+      <button class="btn btn-icon bg-container" aria-label="Close">
+        <span aria-hidden="true" class="icon">close</span>
+      </button>
+      <button class="btn-primary btn-icon" aria-label="Search">
+        <span aria-hidden="true" class="icon">search</span>
+      </button>
+      <button class="btn-outline btn-icon" aria-label="Menu">
+        <span aria-hidden="true" class="icon">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <h4>Disabled</h4>
+    <p class="text-on-surface-variant text-sm">
+      Both the <code>disabled</code> attribute and
+      <code>aria-disabled="true"</code> are styled, so anchors can be disabled
+      too.
+    </p>
+    <div class="flex flex-wrap gap-2 items-center">
+      <button class="btn-primary" disabled>disabled attribute</button>
+      <a class="btn-outline" aria-disabled="true" href="#">aria-disabled</a>
+    </div>
+  </div>
+</section>

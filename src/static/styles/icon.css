@@ -5,6 +5,7 @@
       "wght" var(--icon-wght, 400),
       "GRAD" var(--icon-grad, 0),
       "opsz" var(--icon-opsz, 24);
+    font-size: 24px;
   }
 }
 
@@ -50,24 +51,35 @@
   --icon-grad: 200;
 }
 
+@utility icon-opsz-14 {
+  --icon-opsz: 14;
+  font-size: 14px;
+}
 @utility icon-opsz-20 {
   --icon-opsz: 20;
+  font-size: 20px;
 }
 @utility icon-opsz-24 {
   --icon-opsz: 24;
+  font-size: 24px;
+}
+@utility icon-opsz-36 {
+  --icon-opsz: 36;
+  font-size: 36px;
 }
 @utility icon-opsz-40 {
   --icon-opsz: 40;
+  font-size: 40px;
 }
 @utility icon-opsz-48 {
   --icon-opsz: 48;
+  font-size: 48px;
 }
 
 .icon {
   font-family: "Material Symbols Outlined";
   font-weight: normal;
   font-style: normal;
-  font-size: 24px;
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;

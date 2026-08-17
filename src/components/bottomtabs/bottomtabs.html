@@ -1,3 +1,8 @@
-<div class="grid grid-flow-col bg-container-lowest" {{ .Style }}>
+<div
+  class="grid grid-flow-col bg-container-lowest"
+  {{ .Style }}
+  x-data="bottomtabs"
+  x-show="visible"
+>
   {{ range .Tabs }}{{ . }}{{ end }}
 </div>

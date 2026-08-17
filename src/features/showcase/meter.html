@@ -1,0 +1,53 @@
+<section class="container mx-auto pxc-4 pyc-3 flex flex-col gapc-4">
+  <div class="flex flex-col gap-2">
+    <h4>Ranges</h4>
+    <p class="text-on-surface-variant text-sm">
+      The browser picks the colour from where the value sits relative to
+      <code>low</code>, <code>high</code>, and <code>optimum</code> — the
+      stylesheet only themes each state.
+    </p>
+
+    <label for="meter-optimum">Optimum</label>
+    <meter
+      id="meter-optimum"
+      class="w-full"
+      min="0"
+      max="100"
+      low="30"
+      high="70"
+      optimum="90"
+      value="85"
+    ></meter>
+
+    <label for="meter-suboptimum">Sub-optimum</label>
+    <meter
+      id="meter-suboptimum"
+      class="w-full"
+      min="0"
+      max="100"
+      low="30"
+      high="70"
+      optimum="90"
+      value="50"
+    ></meter>
+
+    <label for="meter-low">Low</label>
+    <meter
+      id="meter-low"
+      class="w-full"
+      min="0"
+      max="100"
+      low="30"
+      high="70"
+      optimum="90"
+      value="15"
+    ></meter>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <h4>Widths</h4>
+    <meter class="w-24" min="0" max="100" value="60"></meter>
+    <meter class="w-48" min="0" max="100" value="60"></meter>
+    <meter class="w-full" min="0" max="100" value="60"></meter>
+  </div>
+</section>

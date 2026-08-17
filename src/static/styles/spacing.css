@@ -1,0 +1,83 @@
+@theme static {
+  /* Fluid spacing unit. Mirrors the fluid type scale in typography.css: the
+     spacing step grows from --spacing-c-min at --fluid-min-vw to --spacing-c-max
+     at --fluid-max-vw, reusing the shared --fluid-progress (0..1) ramp.
+
+     Use the clamped utilities (pc-2, gapc-4, mtc-8, ...) for whitespace that
+     should breathe with the viewport. Keep the plain utilities (p-2, gap-4, ...)
+     for spacing that must stay fixed, e.g. inside buttons and controls. */
+  --spacing-c-min: 0.2rem; /* 0.8x of the 0.25rem base step at the min viewport */
+  --spacing-c-max: 0.75rem; /* 1.25x at the max viewport */
+  --spacing-c: calc(
+    var(--spacing-c-min) + (var(--spacing-c-max) - var(--spacing-c-min)) *
+      var(--fluid-progress)
+  );
+}
+
+/* Clamped spacing utilities: any numeric step works (pc-2, gapc-4, mtc-8, ...).
+   Each resolves to step * --spacing-c instead of step * --spacing. The dynamic
+   -* portion must be last, so the "c" marker attaches to the property prefix. */
+@utility pc-* {
+  padding: calc(var(--spacing-c) * --value(integer));
+}
+@utility pxc-* {
+  padding-inline: calc(var(--spacing-c) * --value(integer));
+}
+@utility pyc-* {
+  padding-block: calc(var(--spacing-c) * --value(integer));
+}
+@utility ptc-* {
+  padding-top: calc(var(--spacing-c) * --value(integer));
+}
+@utility prc-* {
+  padding-right: calc(var(--spacing-c) * --value(integer));
+}
+@utility pbc-* {
+  padding-bottom: calc(var(--spacing-c) * --value(integer));
+}
+@utility plc-* {
+  padding-left: calc(var(--spacing-c) * --value(integer));
+}
+
+@utility mc-* {
+  margin: calc(var(--spacing-c) * --value(integer));
+}
+@utility mxc-* {
+  margin-inline: calc(var(--spacing-c) * --value(integer));
+}
+@utility myc-* {
+  margin-block: calc(var(--spacing-c) * --value(integer));
+}
+@utility mtc-* {
+  margin-top: calc(var(--spacing-c) * --value(integer));
+}
+@utility mrc-* {
+  margin-right: calc(var(--spacing-c) * --value(integer));
+}
+@utility mbc-* {
+  margin-bottom: calc(var(--spacing-c) * --value(integer));
+}
+@utility mlc-* {
+  margin-left: calc(var(--spacing-c) * --value(integer));
+}
+
+@utility gapc-* {
+  gap: calc(var(--spacing-c) * --value(integer));
+}
+@utility gapc-x-* {
+  column-gap: calc(var(--spacing-c) * --value(integer));
+}
+@utility gapc-y-* {
+  row-gap: calc(var(--spacing-c) * --value(integer));
+}
+
+@utility space-xc-* {
+  & > :not(:last-child) {
+    margin-left: calc(var(--spacing-c) * --value(integer));
+  }
+}
+@utility space-yc-* {
+  & > :not(:last-child) {
+    margin-top: calc(var(--spacing-c) * --value(integer));
+  }
+}

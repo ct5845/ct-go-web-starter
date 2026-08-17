@@ -7,11 +7,12 @@ import (
 )
 
 type requestContext struct {
-	mu        sync.Mutex
-	requestID string
-	startTime time.Time
-	skipped   bool
-	spans     []Span
+	mu             sync.Mutex
+	requestID      string
+	startTime      time.Time
+	skipped        bool
+	ignoreDuration bool
+	spans          []Span
 }
 
 // Span records the timing of a named operation within a request.
@@ -60,6 +61,17 @@ func Skip(ctx context.Context) {
 	if rc := fromContext(ctx); rc != nil {
 		rc.mu.Lock()
 		rc.skipped = true
+		rc.mu.Unlock()
+	}
+}
+
+// IgnoreDuration marks the request so that a long wall-clock time does not
+// promote its log entry to Warn. Use for streaming responses where total
+// duration is expected to be long and is not a signal of a problem.
+func IgnoreDuration(ctx context.Context) {
+	if rc := fromContext(ctx); rc != nil {
+		rc.mu.Lock()
+		rc.ignoreDuration = true
 		rc.mu.Unlock()
 	}
 }

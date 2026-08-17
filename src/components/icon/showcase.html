@@ -1,0 +1,36 @@
+<section class="container mx-auto pxc-4 pyc-3 flex flex-col gapc-4">
+  <div class="flex flex-col gap-2">
+    <h4>Subsetted set</h4>
+    <p class="text-on-surface-variant text-sm">
+      Only these render — add a name to <code>icon.Names</code> before using it.
+    </p>
+    <div class="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+      {{ range .Names }}
+      <div
+        class="flex items-center gap-2 rounded-xl border border-outline-variant p-2 bg-container-lowest"
+      >
+        <span aria-hidden="true" class="icon">{{ . }}</span>
+        <code class="text-xs truncate">{{ . }}</code>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <h4>Axes</h4>
+    <p class="text-on-surface-variant text-sm">
+      The same glyph across the variable font's weight, fill, and optical size
+      utilities.
+    </p>
+    <div class="flex flex-wrap gap-4">
+      {{ range .Variants }}
+      <div
+        class="flex flex-col items-center justify-end gap-2 rounded-xl border border-outline-variant p-3 bg-container-lowest min-w-24"
+      >
+        <span aria-hidden="true" class="icon {{ .Class }}">home</span>
+        <code class="text-xs">{{ .Label }}</code>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</section>

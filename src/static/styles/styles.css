@@ -3,6 +3,14 @@
 @import "./typography.css";
 @import "./button.css";
 @import "./menu.css";
+@import "./meter.css";
 @import "./icon.css";
+@import "./spacing.css";
 
 @source "../../**/*.{html,js,go}";
+
+@layer base {
+  input[type="search"]::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}

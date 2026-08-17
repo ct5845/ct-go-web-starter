@@ -2,7 +2,7 @@ package home
 
 import (
 	"ct-go-web-starter/src/components/component"
-	"ct-go-web-starter/src/components/layouttabbed"
+	"ct-go-web-starter/src/components/layoutswitch"
 	"ct-go-web-starter/src/components/page"
 	"ct-go-web-starter/src/features/nav"
 	"ct-go-web-starter/src/infrastructure/reqlog"
@@ -44,16 +44,17 @@ func render() (template.HTML, error) {
 		return "", fmt.Errorf("home page: render content: %w", err)
 	}
 
-	bottomTabs, err := nav.Render("home")
+	navigation, err := nav.Render("home")
 	if err != nil {
-		return "", fmt.Errorf("home page: render bottom tabs: %w", err)
+		return "", fmt.Errorf("home page: render navigation: %w", err)
 	}
 
-	return layouttabbed.RenderPage(page.Options{
+	return layoutswitch.RenderPage(page.Options{
 		Title:           "CT Go Web Starter",
 		MetaDescription: "A modern Go web application starter with HTMX, Alpine.js, and TailwindCSS",
-	}, layouttabbed.Options{
+	}, layoutswitch.Options{
 		Content:    content,
-		BottomTabs: bottomTabs,
+		BottomTabs: navigation.Footer,
+		SideBar:    navigation.SideBar,
 	})
 }

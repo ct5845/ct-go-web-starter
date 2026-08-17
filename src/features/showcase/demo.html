@@ -1,0 +1,21 @@
+<main class="flex flex-col grow">
+  <nav
+    aria-label="Showcase"
+    class="border-b border-outline-variant bg-container-lowest"
+  >
+    <div class="container mx-auto flex gap-2 overflow-x-auto pxc-4 pyc-2">
+      <a href="/showcase" class="btn btn-outline whitespace-nowrap">All</a>
+      {{ range .Links }}{{ . }}{{ end }}
+    </div>
+  </nav>
+
+  <section class="container mx-auto pxc-4 ptc-4 flex flex-col gap-1">
+    <div class="flex items-baseline gap-2 flex-wrap">
+      <h3>{{ .Title }}</h3>
+      <code class="text-xs">src/{{ .Source }}</code>
+    </div>
+    <p class="text-on-surface-variant text-sm">{{ .Description }}</p>
+  </section>
+
+  {{ .Content }}
+</main>

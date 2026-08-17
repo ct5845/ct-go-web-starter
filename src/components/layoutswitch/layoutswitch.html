@@ -1,0 +1,20 @@
+<body class="min-h-full flex flex-col lg:grid lg:grid-cols-[16rem_1fr] lg:grid-rows-[1fr]">
+  <aside class="hidden lg:block lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto border-r border-outline-variant">
+    {{ .SideBar }}
+  </aside>
+
+  <div class="flex flex-col grow min-w-0">{{ .Content }}</div>
+
+  <footer
+    class="lg:hidden sticky bottom-0 z-20 w-full"
+    style="padding-bottom: env(safe-area-inset-bottom)"
+    x-init="
+      const obs = new ResizeObserver(([e]) => {
+        document.body.style.setProperty('--footer-height', e.borderBoxSize[0].blockSize + 'px');
+      });
+      obs.observe($el);
+    "
+  >
+    {{ .BottomTabs }}
+  </footer>
+</body>

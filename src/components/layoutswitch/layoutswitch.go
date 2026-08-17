@@ -1,4 +1,4 @@
-package layouttabbed
+package layoutswitch
 
 import (
 	"ct-go-web-starter/src/components/component"
@@ -7,17 +7,14 @@ import (
 	"html/template"
 )
 
-//go:embed layouttabbed.html
+//go:embed layoutswitch.html
 var layoutHTML string
-var comp = component.New("layouttabbed.html", layoutHTML)
-
-type Tab struct {
-}
+var comp = component.New("layoutswitch.html", layoutHTML)
 
 type Options struct {
-	Header     template.HTML
 	Content    template.HTML
 	BottomTabs template.HTML
+	SideBar    template.HTML
 }
 
 func Render(options Options) (template.HTML, error) {
@@ -25,11 +22,11 @@ func Render(options Options) (template.HTML, error) {
 }
 
 func RenderPage(pageOptions page.Options, options Options) (template.HTML, error) {
-	if body, err := Render(options); err != nil {
+	body, err := Render(options)
+	if err != nil {
 		return "", err
-	} else {
-		pageOptions.Body = body
 	}
 
+	pageOptions.Body = body
 	return page.Render(pageOptions)
 }

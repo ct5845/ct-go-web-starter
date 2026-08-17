@@ -41,7 +41,12 @@ A modern Go web application starter template with HTMX, Alpine.js, and TailwindC
    cp .env.example .env
    ```
 
-4. Run the web development server:
+4. Enable the repository git hooks (runs `gofmt` before each commit):
+   ```bash
+   git config core.hooksPath .githooks
+   ```
+
+5. Run the web development server:
    ```bash
    make web
    ```
@@ -56,22 +61,31 @@ The application will be available at `http://localhost:8080` (or the port set in
 
 ```
 ├── cmd/
-│   ├── web/           # Main entrypoint (starts the server)
+│   ├── web/           # Main entrypoint (starts the server, wires up routes)
 │   └── copyassets/    # Build tool: copies static assets and JS deps to tmp/
 ├── src/
 │   ├── features/      # Features with HTTP surface (routes + handlers)
-│   │   └── home/      # Home page feature
-│   │       ├── home.go    # Handler, routes, and page assembly
-│   │       └── home.html  # Feature template
+│   │   ├── home/      # Home page feature
+│   │   │   ├── home.go    # Handler, routes, and page assembly
+│   │   │   └── home.html  # Feature template
+│   │   ├── showcase/  # One page per component, for building them in isolation
+│   │   └── nav/       # Shared navigation (bottom tabs, sidebar, more sheet)
 │   ├── components/    # UI building blocks with no HTTP surface
-│   │   ├── component/ # Component engine (New, Render, WithJS)
-│   │   └── page/      # Full page shell template
+│   │   ├── component/ # Component engine (New, Render, WithAlpine, WithIIFE)
+│   │   ├── demo/      # Showcase page type, declared by each component
+│   │   ├── page/      # Full page shell template
+│   │   ├── layoutswitch/ # Sidebar on desktop, bottom tabs on mobile
+│   │   ├── layoutfull/   # Full-bleed layout with no chrome
+│   │   ├── sidebar/      # Desktop navigation sidebar
+│   │   ├── bottomtabs/   # Mobile bottom tab bar
+│   │   ├── bottomsheet/  # Modal bottom sheet dialog
+│   │   ├── pagedlist/    # Paginated list with htmx-driven search
+│   │   └── icon/         # Icon font subsetting and inline SVGs
 │   ├── infrastructure/ # Platform and runtime concerns
 │   │   ├── config/    # Configuration and logging
 │   │   ├── compression/ # HTTP response compression
 │   │   └── fileserver/ # Static file serving with caching
-│   ├── static/        # Static assets (favicon, images, etc.)
-│   └── app.go         # Application setup and routing
+│   └── static/        # Static assets (favicon, images, etc.)
 ├── build/             # Production binary output (not in git)
 ├── tmp/               # Dev build output (not in git)
 ├── .air.toml          # Live reload config (Windows)
@@ -89,7 +103,7 @@ The application will be available at `http://localhost:8080` (or the port set in
 
 1. Create a new feature directory in `src/features/`
 2. Add a `.go` file with routes, handler, and page assembly
-3. Register routes in `src/app.go`
+3. Expose `RegisterRoutes(mux *http.ServeMux)` from the feature, and call it from `routes()` in `cmd/web/main.go`
 4. Use components from `src/components/` or create feature-internal ones in the feature directory
 
 **Example: Adding a "blog" feature**
@@ -103,9 +117,19 @@ src/features/blog/
 
 Split into `handler.go` + `page.go` only if page assembly grows complex enough to warrant it.
 
+### Showcase
+
+`/showcase` renders every component on its own page, isolated from any feature. Use it to build and design a component before wiring it into a real page — each page names the file it comes from, and the slug matches the directory under `src/components/` or the stylesheet under `src/static/styles/`.
+
+Each component's demo lives in the component's own directory as `showcase.go`, exporting `var Showcase = demo.Page{...}` — so the component and its demo show up in the same diff. The feature holds only the routes, the index, and the page chrome, plus the demos for stylesheets, which have no component directory to live in.
+
+To add a page: write `showcase.go` next to the component, then add its `Showcase` value to `demos` in [src/features/showcase/showcase.go](src/features/showcase/showcase.go). The index and the per-page navigation are both generated from that slice.
+
 ### Styling
 
 TailwindCSS classes are available throughout the application. Modify `src/static/styles/styles.css` to add custom styles.
+
+Tailwind scans `.html`, `.js`, and `.go` files, so class names written in Go — as the showcase's colour swatches are — are picked up too.
 
 ## Dev Container
 
