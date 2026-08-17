@@ -53,6 +53,8 @@ type Options struct {
 
 	// Search enables the search box above the list. Zero value leaves it out.
 	Search Search
+
+	Theme string
 }
 
 // Search configures the optional search box rendered above the list.
@@ -83,6 +85,7 @@ type templateOptions struct {
 	SearchQuery   string
 	Placeholder   string
 	BaseHref      string
+	Theme         string
 }
 
 // Render produces the list, command bar, and (if enabled) search box for a
@@ -94,6 +97,10 @@ func Render(options Options) (template.HTML, error) {
 	base := options.BaseHref
 	if options.Search.Query != "" {
 		base = withQuery(base, options.Search.Query)
+	}
+	theme := "bg-secondary-container text-on-secondary-container"
+	if options.Theme != "" {
+		theme = options.Theme
 	}
 
 	return pagedlistTpl.Render(templateOptions{
@@ -112,6 +119,7 @@ func Render(options Options) (template.HTML, error) {
 		SearchQuery:   options.Search.Query,
 		Placeholder:   options.Search.Placeholder,
 		BaseHref:      options.BaseHref,
+		Theme:         theme,
 	})
 }
 

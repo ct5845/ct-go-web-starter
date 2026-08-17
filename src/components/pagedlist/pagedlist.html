@@ -8,10 +8,10 @@
   >
     {{ if .SearchEnabled }}
     <div class="hidden md:block container mx-auto ptc-2 pxc-4">
-      <div
-        class="rounded-2xl border-b border-outline bg-inverse-surface text-on-inverse-surface flex gap-2 items-center pc-2"
-      >
-        <span aria-hidden="true" class="icon opacity-75 icon-opsz-20">search</span>
+      <div class="rounded-2xl {{ .Theme }} flex gap-2 items-center pc-2">
+        <span aria-hidden="true" class="icon opacity-75 icon-opsz-20"
+          >search</span
+        >
         <input
           id="{{ .ID }}-search-top"
           hx-preserve="true"
@@ -39,14 +39,12 @@
       </ul>
     </div>
     <div
-      class="sticky md:relative z-10 container mx-auto pxc-4 pbc-2"
+      class="sticky lg:relative z-10 container mx-auto pxc-4 pbc-2"
       style="bottom: calc(var(--footer-height, 0px))"
     >
       {{ if .SearchEnabled }}
       <div class="container mx-auto md:hidden">
-        <div
-          class="rounded-t-2xl border-b border-outline bg-inverse-surface text-on-inverse-surface flex gap-2 items-center pc-2"
-        >
+        <div class="rounded-t-2xl {{ .Theme }} flex gap-2 items-center pc-2">
           <span class="icon opacity-75 icon-opsz-20">search</span>
           <input
             id="{{ .ID }}-search-bottom"
@@ -57,7 +55,7 @@
             value="{{ .SearchQuery }}"
             placeholder="{{ .Placeholder }}"
             aria-label="{{ .Placeholder }}"
-            class="text-sm grow outline-none bg-transparent"
+            class="text-base grow outline-none bg-transparent"
             hx-get="{{ .BaseHref }}"
             hx-trigger="input changed delay:300ms, search"
             hx-target="#{{ .ResultsID }}"
@@ -68,7 +66,7 @@
       </div>
       {{ end }}
       <nav
-        class="rounded-b-2xl bg-inverse-surface text-on-inverse-surface flex items-center gap-2 md:rounded-t-2xl"
+        class="rounded-b-2xl {{ .Theme }} flex items-center gap-2 md:rounded-t-2xl"
         aria-label="Pagination"
       >
         {{ if .HasPrev }}

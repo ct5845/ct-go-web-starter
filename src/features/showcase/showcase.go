@@ -5,8 +5,10 @@ import (
 	"ct-go-web-starter/src/components/bottomtabs"
 	"ct-go-web-starter/src/components/component"
 	"ct-go-web-starter/src/components/demo"
+	"ct-go-web-starter/src/components/dialog"
 	"ct-go-web-starter/src/components/icon"
 	"ct-go-web-starter/src/components/layoutswitch"
+	"ct-go-web-starter/src/components/menu"
 	"ct-go-web-starter/src/components/page"
 	"ct-go-web-starter/src/components/pagedlist"
 	"ct-go-web-starter/src/components/sidebar"
@@ -24,17 +26,19 @@ import (
 // the component's own package; the stylesheet demos live in styles.go because
 // they have no package to sit alongside.
 var demos = []demo.Page{
-	typographyPage,
-	colorsPage,
-	spacingPage,
+	bottomsheet.Showcase,
+	bottomtabs.Showcase,
 	buttonsPage,
+	colorsPage,
+	dialog.Showcase,
 	icon.Showcase,
-	menuPage,
+	menu.Showcase,
+	menuListPage,
 	meterPage,
 	pagedlist.Showcase,
 	sidebar.Showcase,
-	bottomtabs.Showcase,
-	bottomsheet.Showcase,
+	spacingPage,
+	typographyPage,
 }
 
 func lookup(slug string) (demo.Page, bool) {

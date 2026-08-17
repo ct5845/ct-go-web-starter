@@ -5,3 +5,15 @@
 .menu-item {
   @apply flex gap-4 items-center px-4 py-2 border-b border-outline-variant last:border-none;
 }
+
+/* .menu is also used on [popover] elements (see components/menu). Popovers
+   need their own closed/open display toggle — .menu's unconditional
+   display:flex would otherwise beat the UA stylesheet's popover-closed rule
+   and show the menu immediately on page load. */
+[popover].menu {
+  display: none;
+}
+
+[popover].menu:popover-open {
+  display: flex;
+}

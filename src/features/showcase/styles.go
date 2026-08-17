@@ -27,9 +27,9 @@ var (
 	buttonsHTML string
 	buttonsTpl  = component.New("buttons.html", buttonsHTML)
 
-	//go:embed menu.html
-	menuHTML string
-	menuTpl  = component.New("menu.html", menuHTML)
+	//go:embed menulist.html
+	menuListHTML string
+	menuListTpl  = component.New("menulist.html", menuListHTML)
 
 	//go:embed meter.html
 	meterHTML string
@@ -76,13 +76,13 @@ var buttonsPage = demo.Page{
 	},
 }
 
-var menuPage = demo.Page{
-	Slug:        "menu",
-	Title:       "Menu",
+var menuListPage = demo.Page{
+	Slug:        "menu-list",
+	Title:       "Menu list",
 	Source:      "static/styles/menu.css",
-	Description: "The list container used for grouped links and settings rows.",
+	Description: "The .menu/.menu-item list container used for grouped links and settings rows outside of a popover.",
 	Render: func(demo.Request) (template.HTML, error) {
-		return menuTpl.Render(nil)
+		return menuListTpl.Render(nil)
 	},
 }
 

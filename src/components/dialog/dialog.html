@@ -1,0 +1,19 @@
+<dialog
+  closedby="any"
+  aria-modal="true"
+  aria-label="{{ .Label }}"
+  id="{{ .Id }}"
+  class="container mx-auto my-auto max-h-[75vh] max-w-md p-0 border-none rounded-xl overflow-hidden scale-95 open:scale-100 transition-[scale] duration-200 ease-in-out bg-surface-bright backdrop:bg-scrim/50"
+>
+  <header class="pc-2 pb-0 flex justify-end">
+    <button
+      class="flex items-center gap-2 btn btn-icon bg-container"
+      aria-label="Close dialog"
+      command="close"
+      commandfor="{{ .Id }}"
+    >
+      <span aria-hidden="true" class="icon">close</span>
+    </button>
+  </header>
+  <div class="flex flex-col max-h-[75vh] overflow-y-auto">{{ .Content }}</div>
+</dialog>
