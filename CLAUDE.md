@@ -31,7 +31,11 @@ The rule for placement is simple: if it has a route, it's a feature. If it's a U
 
 Feature-internal components (used only within one feature) live in the feature directory and are unexported. Components used across features live in `src/components/`.
 
-Every component in `src/components/` has a showcase page under `src/features/showcase/`, rendering it in isolation from any feature. When you add or change a shared component, add or update its showcase page in the same change — it is where the component gets designed and reviewed.
+Every component in `src/components/` has a showcase page rendering it in isolation from any feature. The demo lives *in the component's own directory* as `showcase.go` (plus any templates it needs), exporting `var Showcase = demo.Page{...}`. A component and its demo therefore change together, in the same diff.
+
+`src/features/showcase/` owns only the routes, the index, and the page chrome; it collects the exported `Showcase` values into its running order. Demos for stylesheets rather than components — typography, colours, spacing, buttons, menu, meter — have no package to sit alongside, so they stay in the feature.
+
+When you add or change a shared component, add or update its showcase page in the same change. It is where the component gets designed and reviewed.
 
 ## Language-Specific Guidelines
 

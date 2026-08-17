@@ -72,6 +72,7 @@ The application will be available at `http://localhost:8080` (or the port set in
 │   │   └── nav/       # Shared navigation (bottom tabs, sidebar, more sheet)
 │   ├── components/    # UI building blocks with no HTTP surface
 │   │   ├── component/ # Component engine (New, Render, WithAlpine, WithIIFE)
+│   │   ├── demo/      # Showcase page type, declared by each component
 │   │   ├── page/      # Full page shell template
 │   │   ├── layoutswitch/ # Sidebar on desktop, bottom tabs on mobile
 │   │   ├── layoutfull/   # Full-bleed layout with no chrome
@@ -120,7 +121,9 @@ Split into `handler.go` + `page.go` only if page assembly grows complex enough t
 
 `/showcase` renders every component on its own page, isolated from any feature. Use it to build and design a component before wiring it into a real page — each page names the file it comes from, and the slug matches the directory under `src/components/` or the stylesheet under `src/static/styles/`.
 
-To add a page, append an entry to `demos` in [src/features/showcase/showcase.go](src/features/showcase/showcase.go) and write its render function. The index and the per-page navigation are both generated from that slice, so there is nothing else to update.
+Each component's demo lives in the component's own directory as `showcase.go`, exporting `var Showcase = demo.Page{...}` — so the component and its demo show up in the same diff. The feature holds only the routes, the index, and the page chrome, plus the demos for stylesheets, which have no component directory to live in.
+
+To add a page: write `showcase.go` next to the component, then add its `Showcase` value to `demos` in [src/features/showcase/showcase.go](src/features/showcase/showcase.go). The index and the per-page navigation are both generated from that slice.
 
 ### Styling
 

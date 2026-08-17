@@ -1,9 +1,15 @@
 package showcase
 
 import (
+	"ct-go-web-starter/src/components/bottomsheet"
+	"ct-go-web-starter/src/components/bottomtabs"
 	"ct-go-web-starter/src/components/component"
+	"ct-go-web-starter/src/components/demo"
+	"ct-go-web-starter/src/components/icon"
 	"ct-go-web-starter/src/components/layoutswitch"
 	"ct-go-web-starter/src/components/page"
+	"ct-go-web-starter/src/components/pagedlist"
+	"ct-go-web-starter/src/components/sidebar"
 	"ct-go-web-starter/src/features/nav"
 	"ct-go-web-starter/src/infrastructure/reqlog"
 	_ "embed"
@@ -14,38 +20,30 @@ import (
 	"net/http"
 )
 
-// demo is one showcase page. Slug matches the component's package name under
-// src/components, or the stylesheet name under src/static/styles, so the page
-// you are looking at tells you which file to edit.
-type demo struct {
-	Slug        string
-	Title       string
-	Source      string
-	Description string
-	Render      func(r *http.Request) (template.HTML, error)
+// demos is the running order of the showcase. Component demos are declared in
+// the component's own package; the stylesheet demos live in styles.go because
+// they have no package to sit alongside.
+var demos = []demo.Page{
+	typographyPage,
+	colorsPage,
+	spacingPage,
+	buttonsPage,
+	icon.Showcase,
+	menuPage,
+	meterPage,
+	pagedlist.Showcase,
+	sidebar.Showcase,
+	bottomtabs.Showcase,
+	bottomsheet.Showcase,
 }
 
-var demos = []demo{
-	{"typography", "Typography", "styles/typography.css", "The fluid type scale and base element styles. Resize the window — every size interpolates between its minimum and maximum viewport value.", renderTypography},
-	{"colors", "Colours", "styles/theme.css", "Every theme token as a background/foreground pair. Each swatch shows the class names to use.", renderColors},
-	{"spacing", "Spacing", "styles/spacing.css", "Clamped spacing utilities that breathe with the viewport, alongside their fixed equivalents.", renderSpacing},
-	{"buttons", "Buttons", "styles/button.css", "Button variants, icon buttons, and disabled states.", renderButtons},
-	{"icons", "Icons", "components/icon", "The subsetted icon font across its weight, fill, and optical size axes.", renderIcons},
-	{"menu", "Menu", "styles/menu.css", "The list container used for grouped links and settings rows.", renderMenu},
-	{"meter", "Meter", "styles/meter.css", "The native meter element, themed across its optimum and sub-optimum ranges.", renderMeter},
-	{"pagedlist", "Paged list", "components/pagedlist", "Pagination and debounced search over a placeholder dataset. Typing and paging swap only the list region via htmx.", renderPagedList},
-	{"sidebar", "Sidebar", "components/sidebar", "The desktop navigation rail, with grouped items and an active state.", renderSidebar},
-	{"bottomtabs", "Bottom tabs", "components/bottomtabs", "The mobile tab bar. Normally only visible below the lg breakpoint.", renderBottomTabs},
-	{"bottomsheet", "Bottom sheet", "components/bottomsheet", "A modal sheet anchored to the bottom of the viewport.", renderBottomSheet},
-}
-
-func lookup(slug string) (demo, bool) {
+func lookup(slug string) (demo.Page, bool) {
 	for _, d := range demos {
 		if d.Slug == slug {
 			return d, true
 		}
 	}
-	return demo{}, false
+	return demo.Page{}, false
 }
 
 func RegisterRoutes(mux *http.ServeMux) {
@@ -75,7 +73,10 @@ func handleDemo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content, err := current.Render(r)
+	content, err := current.Render(demo.Request{
+		BaseHref: r.URL.Path,
+		Query:    r.URL.Query(),
+	})
 	if err != nil {
 		slog.Error("Failed to render showcase demo", "slug", current.Slug, "error", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -117,10 +118,6 @@ var (
 	demoLinkTpl  = component.New("demolink.html", demoLinkHTML)
 )
 
-type indexOptions struct {
-	Items []template.HTML
-}
-
 func renderIndex() (template.HTML, error) {
 	items := make([]template.HTML, len(demos))
 	for i, d := range demos {
@@ -131,7 +128,7 @@ func renderIndex() (template.HTML, error) {
 		items[i] = item
 	}
 
-	content, err := indexTpl.Render(indexOptions{Items: items})
+	content, err := indexTpl.Render(struct{ Items []template.HTML }{items})
 	if err != nil {
 		return "", fmt.Errorf("showcase index: render content: %w", err)
 	}
@@ -154,7 +151,7 @@ type demoOptions struct {
 	Content     template.HTML
 }
 
-func renderDemoPage(current demo, content template.HTML) (template.HTML, error) {
+func renderDemoPage(current demo.Page, content template.HTML) (template.HTML, error) {
 	links := make([]template.HTML, len(demos))
 	for i, d := range demos {
 		props := demoLinkProps{
