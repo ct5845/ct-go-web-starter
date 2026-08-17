@@ -40,7 +40,6 @@ var Names = []string{
 	"chevron_left",
 	"chevron_right",
 	"close",
-	"colors",
 	"first_page",
 	"home",
 	"keyboard_arrow_right",

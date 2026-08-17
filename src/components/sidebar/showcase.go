@@ -22,7 +22,7 @@ func renderShowcase(demo.Request) (template.HTML, error) {
 			}},
 			{Title: "Group", Items: []Item{
 				{Label: "Showcase", Href: "#", Icon: "widgets"},
-				{Label: "Settings", Href: "#", Icon: "colors"},
+				{Label: "Settings", Href: "#", Icon: "widgets"},
 			}},
 		},
 	})

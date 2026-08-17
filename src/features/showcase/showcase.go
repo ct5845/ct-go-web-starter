@@ -12,6 +12,7 @@ import (
 	"ct-go-web-starter/src/components/page"
 	"ct-go-web-starter/src/components/pagedlist"
 	"ct-go-web-starter/src/components/sidebar"
+	"ct-go-web-starter/src/components/tabs"
 	"ct-go-web-starter/src/features/nav"
 	"ct-go-web-starter/src/infrastructure/reqlog"
 	_ "embed"
@@ -38,6 +39,7 @@ var demos = []demo.Page{
 	pagedlist.Showcase,
 	sidebar.Showcase,
 	spacingPage,
+	tabs.Showcase,
 	typographyPage,
 }
 
@@ -116,10 +118,6 @@ var (
 	//go:embed demo.html
 	demoHTML string
 	demoTpl  = component.New("demo.html", demoHTML)
-
-	//go:embed demolink.html
-	demoLinkHTML string
-	demoLinkTpl  = component.New("demolink.html", demoLinkHTML)
 )
 
 func renderIndex() (template.HTML, error) {
@@ -137,70 +135,69 @@ func renderIndex() (template.HTML, error) {
 		return "", fmt.Errorf("showcase index: render content: %w", err)
 	}
 
-	return renderPage("Showcase", "Every component in this starter, on its own page", content)
-}
-
-type demoLinkProps struct {
-	Slug        string
-	Title       string
-	Class       string
-	AriaCurrent template.HTMLAttr
+	return renderPage("Showcase", "Every component in this starter, on its own page", content, true)
 }
 
 type demoOptions struct {
 	Title       string
 	Source      string
 	Description string
-	Links       []template.HTML
+	Nav         template.HTML
 	Content     template.HTML
 }
 
 func renderDemoPage(current demo.Page, content template.HTML) (template.HTML, error) {
-	links := make([]template.HTML, len(demos))
-	for i, d := range demos {
-		props := demoLinkProps{
-			Slug:  d.Slug,
-			Title: d.Title,
-			Class: "btn btn-outline whitespace-nowrap text-on-surface-variant",
-		}
-		if d.Slug == current.Slug {
-			props.Class = "btn btn-outline whitespace-nowrap bg-primary-container text-on-primary-container font-bold"
-			props.AriaCurrent = `aria-current="page"`
-		}
+	demoTabs := make([]tabs.Tab, 0, len(demos)+1)
+	demoTabs = append(demoTabs, tabs.Tab{Label: "All", Href: "/showcase"})
+	for _, d := range demos {
+		demoTabs = append(demoTabs, tabs.Tab{
+			Label:  d.Title,
+			Href:   "/showcase/" + d.Slug,
+			Active: d.Slug == current.Slug,
+		})
+	}
 
-		link, err := demoLinkTpl.Render(props)
-		if err != nil {
-			return "", fmt.Errorf("showcase: render link %q: %w", d.Slug, err)
-		}
-		links[i] = link
+	nav, err := tabs.Render(tabs.Options{Axis: tabs.Horizontal, Tabs: demoTabs})
+	if err != nil {
+		return "", fmt.Errorf("showcase: render nav: %w", err)
 	}
 
 	body, err := demoTpl.Render(demoOptions{
 		Title:       current.Title,
 		Source:      current.Source,
 		Description: current.Description,
-		Links:       links,
+		Nav:         nav,
 		Content:     content,
 	})
 	if err != nil {
 		return "", fmt.Errorf("showcase %q: render demo: %w", current.Slug, err)
 	}
 
-	return renderPage(current.Title, current.Description, body)
+	return renderPage(current.Title, current.Description, body, false)
 }
 
-func renderPage(title, description string, content template.HTML) (template.HTML, error) {
+func renderPage(title, description string, content template.HTML, switchlayout bool) (template.HTML, error) {
 	navigation, err := nav.Render("showcase")
 	if err != nil {
 		return "", fmt.Errorf("showcase page: render navigation: %w", err)
 	}
 
-	return layoutswitch.RenderPage(page.Options{
+	pageOptions := page.Options{
 		Title:           title,
 		MetaDescription: description,
-	}, layoutswitch.Options{
+	}
+
+	var bottomTabs template.HTML
+
+	if switchlayout {
+		bottomTabs = navigation.Footer
+	} else {
+		bottomTabs = ""
+	}
+
+	return layoutswitch.RenderPage(pageOptions, layoutswitch.Options{
 		Content:    content,
-		BottomTabs: navigation.Footer,
+		BottomTabs: bottomTabs,
 		SideBar:    navigation.SideBar,
 	})
 }
