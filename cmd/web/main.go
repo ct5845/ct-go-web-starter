@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"ct-go-web-starter/src/features/home"
-	"ct-go-web-starter/src/features/optiona"
+	"ct-go-web-starter/src/features/showcase"
 	"ct-go-web-starter/src/infrastructure/compression"
 	"ct-go-web-starter/src/infrastructure/config"
 	"ct-go-web-starter/src/infrastructure/fileserver"
@@ -29,7 +29,7 @@ func routes() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	home.RegisterRoutes(mux)
-	optiona.RegisterRoutes(mux)
+	showcase.RegisterRoutes(mux)
 	fileserver.RegisterRoutes(mux, "tmp/static/")
 
 	mux.HandleFunc("GET /favicon.ico", func(w http.ResponseWriter, r *http.Request) {

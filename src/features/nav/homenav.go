@@ -28,7 +28,7 @@ type primaryItem struct {
 // cannot drift apart.
 var primaryItems = []primaryItem{
 	{Label: "Home", Href: "/", Icon: "home", Tab: "home"},
-	{Label: "Option A", Href: "/option-a", Icon: "colors", Tab: "option-a"},
+	{Label: "Showcase", Href: "/showcase", Icon: "widgets", Tab: "showcase"},
 }
 
 func createTabs(activeTab string) (template.HTML, error) {

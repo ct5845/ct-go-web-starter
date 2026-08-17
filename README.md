@@ -68,7 +68,7 @@ The application will be available at `http://localhost:8080` (or the port set in
 │   │   ├── home/      # Home page feature
 │   │   │   ├── home.go    # Handler, routes, and page assembly
 │   │   │   └── home.html  # Feature template
-│   │   ├── optiona/   # Demo feature: paginated, searchable list
+│   │   ├── showcase/  # One page per component, for building them in isolation
 │   │   └── nav/       # Shared navigation (bottom tabs, sidebar, more sheet)
 │   ├── components/    # UI building blocks with no HTTP surface
 │   │   ├── component/ # Component engine (New, Render, WithAlpine, WithIIFE)
@@ -116,9 +116,17 @@ src/features/blog/
 
 Split into `handler.go` + `page.go` only if page assembly grows complex enough to warrant it.
 
+### Showcase
+
+`/showcase` renders every component on its own page, isolated from any feature. Use it to build and design a component before wiring it into a real page — each page names the file it comes from, and the slug matches the directory under `src/components/` or the stylesheet under `src/static/styles/`.
+
+To add a page, append an entry to `demos` in [src/features/showcase/showcase.go](src/features/showcase/showcase.go) and write its render function. The index and the per-page navigation are both generated from that slice, so there is nothing else to update.
+
 ### Styling
 
 TailwindCSS classes are available throughout the application. Modify `src/static/styles/styles.css` to add custom styles.
+
+Tailwind scans `.html`, `.js`, and `.go` files, so class names written in Go — as the showcase's colour swatches are — are picked up too.
 
 ## Dev Container
 

@@ -77,7 +77,7 @@ func routes() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	home.RegisterRoutes(mux)
-	optiona.RegisterRoutes(mux)
+	showcase.RegisterRoutes(mux)
 	fileserver.RegisterRoutes(mux, "tmp/static/")
 
 	return mux

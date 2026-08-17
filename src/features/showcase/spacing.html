@@ -1,0 +1,60 @@
+<section class="container mx-auto pxc-4 pyc-3 flex flex-col gapc-4">
+  <div class="flex flex-col gap-2">
+    <h4>Clamped vs fixed</h4>
+    <p class="text-on-surface-variant text-sm">
+      The top row uses <code>pc-*</code>, which scales with the viewport. The
+      bottom row uses <code>p-*</code>, which does not. Resize the window and
+      only the top row moves.
+    </p>
+
+    <div class="flex flex-wrap gap-2 items-start">
+      <div class="bg-primary-container rounded-lg pc-2">
+        <div class="bg-container-lowest rounded px-2">pc-2</div>
+      </div>
+      <div class="bg-primary-container rounded-lg pc-4">
+        <div class="bg-container-lowest rounded px-2">pc-4</div>
+      </div>
+      <div class="bg-primary-container rounded-lg pc-8">
+        <div class="bg-container-lowest rounded px-2">pc-8</div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2 items-start">
+      <div class="bg-container-high rounded-lg p-2">
+        <div class="bg-container-lowest rounded px-2">p-2</div>
+      </div>
+      <div class="bg-container-high rounded-lg p-4">
+        <div class="bg-container-lowest rounded px-2">p-4</div>
+      </div>
+      <div class="bg-container-high rounded-lg p-8">
+        <div class="bg-container-lowest rounded px-2">p-8</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <h4>Gap</h4>
+    <p class="text-on-surface-variant text-sm">
+      <code>gapc-*</code> applies the same ramp to flex and grid gaps.
+    </p>
+    <div class="flex gapc-2 bg-container-high rounded-lg p-2">
+      <div class="bg-container-lowest rounded px-3 py-1">gapc-2</div>
+      <div class="bg-container-lowest rounded px-3 py-1">gapc-2</div>
+      <div class="bg-container-lowest rounded px-3 py-1">gapc-2</div>
+    </div>
+    <div class="flex gapc-6 bg-container-high rounded-lg p-2">
+      <div class="bg-container-lowest rounded px-3 py-1">gapc-6</div>
+      <div class="bg-container-lowest rounded px-3 py-1">gapc-6</div>
+      <div class="bg-container-lowest rounded px-3 py-1">gapc-6</div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <h4>When to use which</h4>
+    <p class="text-on-surface-variant text-sm">
+      Use the clamped utilities for page and section whitespace that should
+      breathe. Keep the fixed ones inside buttons and controls, where the
+      spacing is part of the component rather than the layout.
+    </p>
+  </div>
+</section>

@@ -31,6 +31,8 @@ The rule for placement is simple: if it has a route, it's a feature. If it's a U
 
 Feature-internal components (used only within one feature) live in the feature directory and are unexported. Components used across features live in `src/components/`.
 
+Every component in `src/components/` has a showcase page under `src/features/showcase/`, rendering it in isolation from any feature. When you add or change a shared component, add or update its showcase page in the same change — it is where the component gets designed and reviewed.
+
 ## Language-Specific Guidelines
 
 - Go: see [agents/golang.md](agents/golang.md)
