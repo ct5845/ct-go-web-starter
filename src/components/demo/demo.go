@@ -24,6 +24,11 @@ type Page struct {
 
 	Title string
 
+	// Group collects related pages under one primary tab (e.g. "Inputs"),
+	// with a secondary tab row listing the group's own pages. Pages with no
+	// Group get their own primary tab.
+	Group string
+
 	// Source is the path under src/, shown on the page.
 	Source string
 

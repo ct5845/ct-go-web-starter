@@ -8,6 +8,7 @@ import (
 var Showcase = demo.Page{
 	Slug:        "textinput",
 	Title:       "Text input",
+	Group:       "Inputs",
 	Source:      "components/textinput",
 	Description: "Single-line text, number, and password inputs, wrapped with a label, hint, and error via the field component.",
 	Render:      renderShowcase,

@@ -20,6 +20,7 @@ var (
 var Showcase = demo.Page{
 	Slug:        "datetimeinput",
 	Title:       "Date/time input",
+	Group:       "Inputs",
 	Source:      "components/datetimeinput",
 	Description: "Date, time, and combined date+time inputs, using the browser's own picker.",
 	Render:      renderShowcase,

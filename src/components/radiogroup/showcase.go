@@ -8,6 +8,7 @@ import (
 var Showcase = demo.Page{
 	Slug:        "radiogroup",
 	Title:       "Radio group",
+	Group:       "Inputs",
 	Source:      "components/radiogroup",
 	Description: "A single-choice group of native radio inputs, styled as a segmented row of pills in the style of tabs.",
 	Render:      renderShowcase,

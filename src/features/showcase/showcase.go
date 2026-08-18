@@ -8,6 +8,7 @@ import (
 	"ct-go-web-starter/src/components/datetimeinput"
 	"ct-go-web-starter/src/components/demo"
 	"ct-go-web-starter/src/components/dialog"
+	"ct-go-web-starter/src/components/dropdown"
 	"ct-go-web-starter/src/components/icon"
 	"ct-go-web-starter/src/components/layoutswitch"
 	"ct-go-web-starter/src/components/menu"
@@ -18,6 +19,7 @@ import (
 	"ct-go-web-starter/src/components/tabs"
 	"ct-go-web-starter/src/components/textarea"
 	"ct-go-web-starter/src/components/textinput"
+	"ct-go-web-starter/src/components/toggle"
 	"ct-go-web-starter/src/features/nav"
 	"ct-go-web-starter/src/infrastructure/reqlog"
 	_ "embed"
@@ -39,6 +41,7 @@ var demos = []demo.Page{
 	colorsPage,
 	datetimeinput.Showcase,
 	dialog.Showcase,
+	dropdown.Showcase,
 	icon.Showcase,
 	menu.Showcase,
 	menuListPage,
@@ -50,6 +53,7 @@ var demos = []demo.Page{
 	tabs.Showcase,
 	textarea.Showcase,
 	textinput.Showcase,
+	toggle.Showcase,
 	typographyPage,
 }
 
@@ -153,13 +157,39 @@ type demoOptions struct {
 	Source      string
 	Description string
 	Nav         template.HTML
+	Group       string
+	GroupNav    template.HTML
 	Content     template.HTML
+}
+
+// groupHref links a group's primary tab to its first member, so picking
+// "Inputs" lands somewhere real rather than a dead group-only page.
+func groupHref(group string) string {
+	for _, d := range demos {
+		if d.Group == group {
+			return "/showcase/" + d.Slug
+		}
+	}
+	return "/showcase"
 }
 
 func renderDemoPage(current demo.Page, content template.HTML) (template.HTML, error) {
 	demoTabs := make([]tabs.Tab, 0, len(demos)+1)
 	demoTabs = append(demoTabs, tabs.Tab{Label: "All", Href: "/showcase"})
+	seenGroups := make(map[string]bool)
 	for _, d := range demos {
+		if d.Group != "" {
+			if seenGroups[d.Group] {
+				continue
+			}
+			seenGroups[d.Group] = true
+			demoTabs = append(demoTabs, tabs.Tab{
+				Label:  d.Group,
+				Href:   groupHref(d.Group),
+				Active: d.Group == current.Group,
+			})
+			continue
+		}
 		demoTabs = append(demoTabs, tabs.Tab{
 			Label:  d.Title,
 			Href:   "/showcase/" + d.Slug,
@@ -172,11 +202,32 @@ func renderDemoPage(current demo.Page, content template.HTML) (template.HTML, er
 		return "", fmt.Errorf("showcase: render nav: %w", err)
 	}
 
+	var groupNav template.HTML
+	if current.Group != "" {
+		groupTabs := make([]tabs.Tab, 0, len(demos))
+		for _, d := range demos {
+			if d.Group != current.Group {
+				continue
+			}
+			groupTabs = append(groupTabs, tabs.Tab{
+				Label:  d.Title,
+				Href:   "/showcase/" + d.Slug,
+				Active: d.Slug == current.Slug,
+			})
+		}
+		groupNav, err = tabs.Render(tabs.Options{Axis: tabs.Horizontal, Tabs: groupTabs})
+		if err != nil {
+			return "", fmt.Errorf("showcase: render group nav: %w", err)
+		}
+	}
+
 	body, err := demoTpl.Render(demoOptions{
 		Title:       current.Title,
 		Source:      current.Source,
 		Description: current.Description,
 		Nav:         nav,
+		Group:       current.Group,
+		GroupNav:    groupNav,
 		Content:     content,
 	})
 	if err != nil {

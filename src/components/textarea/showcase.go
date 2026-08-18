@@ -8,6 +8,7 @@ import (
 var Showcase = demo.Page{
 	Slug:        "textarea",
 	Title:       "Textarea",
+	Group:       "Inputs",
 	Source:      "components/textarea",
 	Description: "A multi-line text input, wrapped with a label, hint, and error via the field component.",
 	Render:      renderShowcase,

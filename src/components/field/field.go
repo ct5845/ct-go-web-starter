@@ -17,8 +17,12 @@ var (
 )
 
 type Options struct {
-	Id       string
-	Label    string
+	Id    string
+	Label string
+	// NoLabel skips the field's own <label>, for inputs whose template
+	// renders its own inline label (e.g. toggle, where the label sits beside
+	// the switch rather than above it).
+	NoLabel  bool
 	Hint     string
 	Error    string
 	Required bool
@@ -64,6 +68,7 @@ func ids(id string) (hintId, errorId string) {
 type templateOptions struct {
 	Id       string
 	Label    string
+	NoLabel  bool
 	Required bool
 	Hint     string
 	HintId   template.HTMLAttr
@@ -79,6 +84,7 @@ func Render(options Options) (template.HTML, error) {
 	opts := templateOptions{
 		Id:       options.Id,
 		Label:    options.Label,
+		NoLabel:  options.NoLabel,
 		Required: options.Required,
 		Hint:     options.Hint,
 		Error:    options.Error,

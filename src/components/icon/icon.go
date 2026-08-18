@@ -37,6 +37,7 @@ func init() {
 // Names lists every icon used anywhere in the app's templates. An icon must be
 // listed here or it is not included in the subsetted font and will not render.
 var Names = []string{
+	"arrow_drop_down",
 	"check_box",
 	"check_box_outline_blank",
 	"check_circle",
@@ -49,6 +50,8 @@ var Names = []string{
 	"last_page",
 	"menu",
 	"search",
+	"toggle_on",
+	"toggle_off",
 	"visibility",
 	"visibility_off",
 	"widgets",

@@ -4,11 +4,12 @@
   x-data="inputControl('{{ .Id }}')"
   x-on:change="change($event)"
 >
+  {{ if not .NoLabel }}
   <label for="{{ .Id }}"
     >{{ .Label }}{{ if .Required }}<span aria-hidden="true"> *</span>{{ end
     }}</label
   >
-  {{ .Input }} {{ if .Hint }}
+  {{ end }} {{ .Input }} {{ if .Hint }}
   <p {{ .HintId }} class="field-hint text-xs text-on-surface-variant">{{ .Hint }}</p>
   {{ end }} {{ if .Error }}
   <p {{ .ErrorId }} class="text-xs text-error" role="alert">{{ .Error }}</p>

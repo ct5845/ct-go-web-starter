@@ -12,6 +12,9 @@
       <code class="text-xs">src/{{ .Source }}</code>
     </div>
     <nav aria-label="Showcase">{{ .Nav }}</nav>
+    {{ if .GroupNav }}
+    <nav aria-label="{{ .Group }}">{{ .GroupNav }}</nav>
+    {{ end }}
     <p class="text-on-surface-variant text-sm">{{ .Description }}</p>
   </section>
 

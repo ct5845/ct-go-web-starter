@@ -8,6 +8,7 @@ import (
 var Showcase = demo.Page{
 	Slug:        "checkboxgroup",
 	Title:       "Checkbox group",
+	Group:       "Inputs",
 	Source:      "components/checkboxgroup",
 	Description: "A multi-choice group of native checkbox inputs, styled as a segmented row of pills in the style of tabs and radiogroup.",
 	Render:      renderShowcase,
