@@ -4,6 +4,7 @@ import (
 	"ct-go-web-starter/src/components/bottomsheet"
 	"ct-go-web-starter/src/components/bottomtabs"
 	"ct-go-web-starter/src/components/checkboxgroup"
+	"ct-go-web-starter/src/components/combobox"
 	"ct-go-web-starter/src/components/component"
 	"ct-go-web-starter/src/components/datetimeinput"
 	"ct-go-web-starter/src/components/demo"
@@ -39,6 +40,7 @@ var demos = []demo.Page{
 	buttonsPage,
 	checkboxgroup.Showcase,
 	colorsPage,
+	combobox.Showcase,
 	datetimeinput.Showcase,
 	dialog.Showcase,
 	dropdown.Showcase,

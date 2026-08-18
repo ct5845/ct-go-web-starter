@@ -1,0 +1,20 @@
+.combobox-option:has(input:checked) {
+  @apply bg-secondary-container text-on-secondary-container font-semibold;
+}
+
+.combobox-option:has(input:focus-visible) {
+  @apply outline-2 -outline-offset-2 outline-primary;
+}
+
+/* display:none by default, shown only once the option's own input is
+   checked. Scoped under .combobox-option rather than a bare .combobox-check
+   rule: icon.css's own unlayered `.icon { display: inline-block }` ties on
+   specificity with a bare class selector, so which one wins comes down to
+   @import order rather than intent — see radiogroup.css for the same fix. */
+.combobox-option .combobox-check {
+  display: none;
+}
+
+.combobox-option:has(input:checked) .combobox-check {
+  display: inline-flex;
+}

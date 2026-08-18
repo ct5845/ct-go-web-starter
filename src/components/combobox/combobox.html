@@ -1,0 +1,57 @@
+<div x-data="combobox('{{ .Id }}', {{ .Multi }})" data-selected-text="{{ .SelectedText }}">
+  <button
+    type="button"
+    id="{{ .Id }}-trigger"
+    popovertarget="{{ .Id }}-popover"
+    style="anchor-name: --anchor-{{ .Id }}"
+    aria-label="{{ .Label }}"
+    {{ if .Required }}aria-required="true"{{ end }}
+    {{ .DescribedBy }}
+    {{ .Invalid }}
+    class="field-control flex items-center gap-2 text-left"
+  >
+    <span class="grow truncate" x-text="selectedText || '{{ .Placeholder }}'"></span>
+    <span aria-hidden="true" class="icon text-on-surface-variant shrink-0">arrow_drop_down</span>
+  </button>
+
+  <div
+    popover
+    id="{{ .Id }}-popover"
+    style="position-anchor: --anchor-{{ .Id }}; position-area: bottom span-right; position-try-fallbacks: flip-block; inset: auto; margin-block-start: 0.25rem"
+    class="menu min-w-64 max-h-80 overflow-hidden"
+    x-on:toggle="focusSearch($event)"
+  >
+    <div class="flex gap-2 items-center p-2 border-b border-outline-variant">
+      <span aria-hidden="true" class="icon opacity-75 icon-opsz-20">search</span>
+      <input
+        type="search"
+        name="q"
+        autocomplete="off"
+        placeholder="Search"
+        aria-label="Search {{ .Label }}"
+        value="{{ .Query }}"
+        x-ref="search"
+        class="text-sm grow outline-none bg-transparent"
+        hx-get="{{ .BaseHref }}"
+        hx-trigger="input changed delay:300ms, search"
+        hx-target="#{{ .ResultsId }}"
+        hx-select="#{{ .ResultsId }}"
+      />
+    </div>
+    <div
+      id="{{ .ResultsId }}"
+      class="min-h-0 overflow-y-auto"
+      x-on:change.stop="pick($event)"
+      x-on:scroll="loadNextPage($event)"
+    >
+      {{ if .ResultsNote }}
+      <p class="text-xs text-on-surface-variant p-2">{{ .ResultsNote }}</p>
+      {{ end }} {{ if .Pinned }}
+      <div id="{{ .ResultsId }}-pinned" class="border-b border-outline-variant">{{ range .Pinned }}{{ . }}{{ end }}</div>
+      {{ end }}
+      <div id="{{ .ResultsId }}-page" data-next-page-href="{{ .NextPageHref }}">
+        {{ range .Results }}{{ . }}{{ end }}
+      </div>
+    </div>
+  </div>
+</div>
