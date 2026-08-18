@@ -13,7 +13,6 @@ type component struct {
 	scriptTemplate *texttemplate.Template
 }
 
-// New creates a new component with the given name and HTML template string
 func New(name, htmlTemplate string) *component {
 	tmpl, err := template.New(name).Parse(htmlTemplate)
 	if err != nil {
@@ -25,7 +24,6 @@ func New(name, htmlTemplate string) *component {
 	}
 }
 
-// withScript creates a component with both HTML and JavaScript templates.
 // The JS template uses <<< >>> delimiters to avoid conflicts with Go/JavaScript templates.
 func withScript(name, htmlTemplate, jsTemplate string) *component {
 	var scriptTmpl *texttemplate.Template
@@ -63,8 +61,7 @@ func withScript(name, htmlTemplate, jsTemplate string) *component {
 	}
 }
 
-// WithIIFE wraps the JS template in an immediately-invoked function expression,
-// keeping its declarations out of the global scope.
+// WithIIFE keeps the JS template's declarations out of the global scope.
 func WithIIFE(name, htmlTemplate, jsTemplate string) *component {
 	wrappedJS := fmt.Sprintf(`(function() {
 %s

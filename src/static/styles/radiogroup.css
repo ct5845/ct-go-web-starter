@@ -1,0 +1,25 @@
+.radiogroup-option {
+  @apply cursor-pointer;
+
+  &:has(input:checked) {
+    @apply bg-secondary-container text-on-secondary-container font-semibold;
+  }
+
+  &:has(input:focus-visible) {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}
+
+/* display:none by default, shown only once the option's own radio is
+   checked. Scoped under .radiogroup-option rather than a bare
+   .radiogroup-check rule: icon.css's own unlayered `.icon { display:
+   inline-block }` ties on specificity with a bare class selector, so which
+   one wins comes down to @import order rather than intent. The extra
+   ancestor class settles that regardless of import order. */
+.radiogroup-option .radiogroup-check {
+  display: none;
+}
+
+.radiogroup-option:has(input:checked) .radiogroup-check {
+  display: inline-flex;
+}

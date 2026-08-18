@@ -1,0 +1,15 @@
+<label
+  for="{{ .Id }}"
+  class="radiogroup-option btn rounded-none! whitespace-nowrap text-on-surface-variant"
+>
+  <input
+    type="radio"
+    id="{{ .Id }}"
+    name="{{ .Name }}"
+    value="{{ .Value }}"
+    {{ if .Checked }}checked{{ end }}
+    class="field-control sr-only"
+  />
+  <span aria-hidden="true" class="icon radiogroup-check">check_circle</span>
+  {{ .Label }}
+</label>

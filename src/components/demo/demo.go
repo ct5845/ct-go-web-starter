@@ -24,11 +24,11 @@ type Page struct {
 
 	Title string
 
-	// Source is the path under src/ the demo renders from, shown on the page.
+	// Source is the path under src/, shown on the page.
 	Source string
 
 	Description string
 
-	// Render draws the demo. Most demos are static and ignore the request.
+	// Most demos are static and ignore the request.
 	Render func(Request) (template.HTML, error)
 }

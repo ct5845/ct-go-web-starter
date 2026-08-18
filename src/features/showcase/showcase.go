@@ -3,7 +3,9 @@ package showcase
 import (
 	"ct-go-web-starter/src/components/bottomsheet"
 	"ct-go-web-starter/src/components/bottomtabs"
+	"ct-go-web-starter/src/components/checkboxgroup"
 	"ct-go-web-starter/src/components/component"
+	"ct-go-web-starter/src/components/datetimeinput"
 	"ct-go-web-starter/src/components/demo"
 	"ct-go-web-starter/src/components/dialog"
 	"ct-go-web-starter/src/components/icon"
@@ -11,8 +13,11 @@ import (
 	"ct-go-web-starter/src/components/menu"
 	"ct-go-web-starter/src/components/page"
 	"ct-go-web-starter/src/components/pagedlist"
+	"ct-go-web-starter/src/components/radiogroup"
 	"ct-go-web-starter/src/components/sidebar"
 	"ct-go-web-starter/src/components/tabs"
+	"ct-go-web-starter/src/components/textarea"
+	"ct-go-web-starter/src/components/textinput"
 	"ct-go-web-starter/src/features/nav"
 	"ct-go-web-starter/src/infrastructure/reqlog"
 	_ "embed"
@@ -30,16 +35,21 @@ var demos = []demo.Page{
 	bottomsheet.Showcase,
 	bottomtabs.Showcase,
 	buttonsPage,
+	checkboxgroup.Showcase,
 	colorsPage,
+	datetimeinput.Showcase,
 	dialog.Showcase,
 	icon.Showcase,
 	menu.Showcase,
 	menuListPage,
 	meterPage,
 	pagedlist.Showcase,
+	radiogroup.Showcase,
 	sidebar.Showcase,
 	spacingPage,
 	tabs.Showcase,
+	textarea.Showcase,
+	textinput.Showcase,
 	typographyPage,
 }
 

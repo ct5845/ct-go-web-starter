@@ -1,0 +1,16 @@
+<div
+  class="field flex flex-col gap-1"
+  {{ .Invalid }}
+  x-data="inputControl('{{ .Id }}')"
+  x-on:change="change($event)"
+>
+  <label for="{{ .Id }}"
+    >{{ .Label }}{{ if .Required }}<span aria-hidden="true"> *</span>{{ end
+    }}</label
+  >
+  {{ .Input }} {{ if .Hint }}
+  <p {{ .HintId }} class="field-hint text-xs text-on-surface-variant">{{ .Hint }}</p>
+  {{ end }} {{ if .Error }}
+  <p {{ .ErrorId }} class="text-xs text-error" role="alert">{{ .Error }}</p>
+  {{ end }}
+</div>

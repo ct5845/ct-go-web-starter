@@ -21,8 +21,7 @@ var (
 	showcaseTpl  = component.New("showcase.html", showcaseHTML)
 )
 
-// variant pairs a set of icon utility classes with a label, so the axes of the
-// variable font can be compared side by side.
+// variant lets the axes of the variable font be compared side by side.
 type variant struct {
 	Class string
 	Label string

@@ -1,0 +1,14 @@
+<input
+  id="{{ .Id }}"
+  name="{{ .Name }}"
+  type="{{ .Type }}"
+  value="{{ .Value }}"
+  {{ if .Min }}min="{{ .Min }}"{{ end }}
+  {{ if .Max }}max="{{ .Max }}"{{ end }}
+  {{ if .Step }}step="{{ .Step }}"{{ end }}
+  {{ if .Required }}required{{ end }}
+  {{ .DescribedBy }}
+  {{ .Invalid }}
+  {{ .Attrs }}
+  class="field-control"
+/>

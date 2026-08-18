@@ -28,7 +28,7 @@ Comment the *why*, never the *what*. A comment that restates what the code plain
 
 Keep a comment only when it captures something the code cannot: a constraint (`// field order must match for gob decoding`), a non-obvious rationale (`// clearing primary also clears secondary`), an external quirk, or a deliberate trade-off. If you're tempted to explain what a function does, rename it instead.
 
-Doc comments on exported identifiers are worth keeping when they add information beyond the name, but hold them to the same bar — one line that says something the signature doesn't, not a paragraph restating it.
+This applies to exported identifiers too, including package docs, structs, and their fields. A struct whose field names already say what they hold (`type Options struct { Label string; Hint string }`) needs no doc comment — adding one just restates the names in prose. Write one only when there's a real constraint to capture (an ordering requirement, a unit, a "must match X elsewhere"), and keep it to the one line that says that thing — not a paragraph walking through what every field is. Most types in this codebase should have zero doc comment lines for every line of declaration; if a comment block is longer than the type it describes, that's the signal to cut it.
 
 ## Prefer Functions Over Methods
 
