@@ -5,6 +5,7 @@ import (
 	"ct-go-web-starter/src/components/demo"
 	_ "embed"
 	"html/template"
+	"time"
 )
 
 // These demos document stylesheets rather than components, so unlike the
@@ -34,6 +35,10 @@ var (
 	//go:embed meter.html
 	meterHTML string
 	meterTpl  = component.New("meter.html", meterHTML)
+
+	//go:embed htmxindicator.html
+	htmxIndicatorHTML string
+	htmxIndicatorTpl  = component.New("htmxindicator.html", htmxIndicatorHTML)
 )
 
 var typographyPage = demo.Page{
@@ -93,6 +98,40 @@ var meterPage = demo.Page{
 	Description: "The native meter element, themed across its optimum and sub-optimum ranges.",
 	Render: func(demo.Request) (template.HTML, error) {
 		return meterTpl.Render(nil)
+	},
+}
+
+// htmxIndicatorDelay slows this demo's own response just enough to see the
+// placeholder pulse rather than snap straight to complete on a fast local
+// response.
+const htmxIndicatorDelay = 1500 * time.Millisecond
+
+type htmxIndicatorResult struct {
+	Loaded  bool
+	Content template.HTML
+}
+
+var htmxIndicatorPage = demo.Page{
+	Slug:        "htmx-indicator",
+	Title:       "Htmx indicator",
+	Source:      "static/styles/htmxindicator.css",
+	Description: "The .htmx-indicator utility: hidden until htmx toggles its \"htmx-request\" class on the element an hx-indicator points at, so a swapped-out region can show a placeholder with no JS of its own.",
+	Render: func(request demo.Request) (template.HTML, error) {
+		// The page itself renders instantly with an empty, unloaded result;
+		// its own hx-trigger="load" immediately re-requests with load=true,
+		// so every page view (including a plain refresh) shows the
+		// placeholder for htmxIndicatorDelay before the real content lands.
+		// The loaded response drops hx-trigger="load" from the swapped-in
+		// markup, since re-adding it would re-fire on every swap.
+		if request.Query.Get("load") != "true" {
+			return htmxIndicatorTpl.Render(htmxIndicatorResult{})
+		}
+
+		time.Sleep(htmxIndicatorDelay)
+		return htmxIndicatorTpl.Render(htmxIndicatorResult{
+			Loaded:  true,
+			Content: template.HTML("Loaded at " + time.Now().Format("15:04:05.000")),
+		})
 	},
 }
 

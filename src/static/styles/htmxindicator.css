@@ -1,0 +1,14 @@
+/* htmx toggles the "htmx-request" class on the element making the request
+   (or on whatever hx-indicator points at) for the duration of that request.
+   Elements marked htmx-indicator stay hidden until then, so a swapped-out
+   region can show a placeholder without any JS of its own. */
+@layer base {
+  .htmx-indicator {
+    @apply hidden;
+  }
+
+  .htmx-request.htmx-indicator,
+  .htmx-request .htmx-indicator {
+    @apply block animate-pulse;
+  }
+}

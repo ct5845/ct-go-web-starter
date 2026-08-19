@@ -11,6 +11,8 @@
 @import "./toggle.css";
 @import "./combobox.css";
 @import "./icon.css";
+@import "./pageloader.css";
+@import "./htmxindicator.css";
 @import "./spacing.css";
 
 @source "../../**/*.{html,js,go}";

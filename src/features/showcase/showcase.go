@@ -15,6 +15,7 @@ import (
 	"ct-go-web-starter/src/components/menu"
 	"ct-go-web-starter/src/components/page"
 	"ct-go-web-starter/src/components/pagedlist"
+	"ct-go-web-starter/src/components/pageloader"
 	"ct-go-web-starter/src/components/radiogroup"
 	"ct-go-web-starter/src/components/sidebar"
 	"ct-go-web-starter/src/components/tabs"
@@ -44,11 +45,13 @@ var demos = []demo.Page{
 	datetimeinput.Showcase,
 	dialog.Showcase,
 	dropdown.Showcase,
+	htmxIndicatorPage,
 	icon.Showcase,
 	menu.Showcase,
 	menuListPage,
 	meterPage,
 	pagedlist.Showcase,
+	pageloader.Showcase,
 	radiogroup.Showcase,
 	sidebar.Showcase,
 	spacingPage,
