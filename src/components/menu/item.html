@@ -1,0 +1,18 @@
+{{ if .IsSubmenu }}
+<button
+  type="button"
+  popovertarget="{{ .SubmenuId }}"
+  style="{{ .Style }}"
+  class="menu-item w-full text-left"
+>
+  {{ if .Icon }}<span aria-hidden="true" class="icon">{{ .Icon }}</span>{{ end }}
+  <span class="grow">{{ .Label }}</span>
+  <span aria-hidden="true" class="icon">keyboard_arrow_right</span>
+</button>
+{{ .Submenu }}
+{{ else }}
+<a class="menu-item" href="{{ .Href }}">
+  {{ if .Icon }}<span aria-hidden="true" class="icon">{{ .Icon }}</span>{{ end }}
+  <span class="grow">{{ .Label }}</span>
+</a>
+{{ end }}

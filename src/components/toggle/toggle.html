@@ -1,0 +1,17 @@
+<label for="{{ .Id }}" class="toggle inline-flex items-center gap-2 cursor-pointer w-fit">
+  <input
+    type="checkbox"
+    id="{{ .Id }}"
+    name="{{ .Name }}"
+    {{ if .Checked }}checked{{ end }}
+    {{ if .Required }}required{{ end }}
+    {{ .DescribedBy }}
+    {{ .Invalid }}
+    class="field-control toggle-input sr-only"
+  />
+  <span aria-hidden="true" class="icon icon-fill-1 toggle-on">toggle_on</span>
+  <span aria-hidden="true" class="icon toggle-off">toggle_off</span>
+  <span class="text-sm text-on-surface"
+    >{{ .Label }}{{ if .Required }}<span aria-hidden="true"> *</span>{{ end }}</span
+  >
+</label>

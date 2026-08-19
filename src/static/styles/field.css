@@ -1,0 +1,28 @@
+@utility field-control {
+  @apply w-full bg-container-lowest border border-outline-variant rounded-xl p-2 text-sm text-on-surface outline-none transition-colors duration-150;
+
+  &:focus {
+    @apply border-primary;
+  }
+
+  &:user-invalid {
+    @apply border-error;
+  }
+
+  &:disabled {
+    @apply opacity-50 pointer-events-none;
+  }
+}
+
+.field[data-invalid="true"] .field-control {
+  @apply border-error;
+}
+
+/* The hint text doubles as the native-validation message: once the browser
+   considers a field's own input :user-invalid (required/type/pattern/etc,
+   after the user has interacted with it), the hint restyles as an error
+   instead of a separate message. Server-side Error stays its own <p> below,
+   for validation the browser can't express as a constraint. */
+.field:has(.field-control:user-invalid) .field-hint {
+  @apply text-error;
+}

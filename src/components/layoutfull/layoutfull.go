@@ -3,6 +3,7 @@ package layoutfull
 import (
 	"ct-go-web-starter/src/components/component"
 	"ct-go-web-starter/src/components/page"
+	"ct-go-web-starter/src/components/pageloader"
 	_ "embed"
 	"html/template"
 )
@@ -15,8 +16,18 @@ type Options struct {
 	Content template.HTML
 }
 
+type templateOptions struct {
+	Options
+	PageLoader template.HTML
+}
+
 func Render(options Options) (template.HTML, error) {
-	return comp.Render(options)
+	pageLoader, err := pageloader.Render()
+	if err != nil {
+		return "", err
+	}
+
+	return comp.Render(templateOptions{Options: options, PageLoader: pageLoader})
 }
 
 func RenderPage(pageOptions page.Options, options Options) (template.HTML, error) {

@@ -1,0 +1,30 @@
+<section class="container mx-auto pxc-4 pyc-3 flex flex-col gap-3 max-w-sm">
+  <button
+    type="button"
+    class="btn btn-primary w-fit"
+    hx-get="/showcase/htmx-indicator?load=true"
+    hx-select="#htmxindicator-result"
+    hx-target="#htmxindicator-result"
+    hx-swap="outerHTML"
+    hx-indicator="#htmxindicator-placeholder"
+  >
+    Reload
+  </button>
+
+  <div class="grid *:col-start-1 *:row-start-1">
+    <div
+      id="htmxindicator-result"
+      class="rounded-xl bg-container p-4 h-16"
+      {{ if not .Loaded }}
+      hx-get="/showcase/htmx-indicator?load=true"
+      hx-select="#htmxindicator-result"
+      hx-trigger="load"
+      hx-swap="outerHTML"
+      hx-indicator="#htmxindicator-placeholder"
+      {{ end }}
+    >
+      {{ .Content }}
+    </div>
+    <div id="htmxindicator-placeholder" class="htmx-indicator rounded-xl bg-container-high h-16"></div>
+  </div>
+</section>

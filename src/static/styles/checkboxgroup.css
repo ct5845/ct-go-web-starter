@@ -1,0 +1,34 @@
+.checkboxgroup-option {
+  @apply cursor-pointer;
+
+  &:has(input:checked) {
+    @apply bg-secondary-container text-on-secondary-container font-semibold;
+  }
+
+  &:has(input:focus-visible) {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}
+
+/* Exactly one of the filled/outline box icons shows at a time, following the
+   option's own checkbox state. Scoped under .checkboxgroup-option rather
+   than bare .checkboxgroup-check/-unchecked rules: icon.css's own unlayered
+   `.icon { display: inline-block }` ties on specificity with a bare class
+   selector, so which one wins comes down to @import order rather than
+   intent. The extra ancestor class settles that regardless of import
+   order. */
+.checkboxgroup-option .checkboxgroup-check {
+  display: none;
+}
+
+.checkboxgroup-option:has(input:checked) .checkboxgroup-check {
+  display: inline-flex;
+}
+
+.checkboxgroup-option .checkboxgroup-unchecked {
+  display: inline-flex;
+}
+
+.checkboxgroup-option:has(input:checked) .checkboxgroup-unchecked {
+  display: none;
+}

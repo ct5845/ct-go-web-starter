@@ -34,16 +34,12 @@ const (
 	resultsID = "pagedlist-results"
 )
 
-// Options configures a single page of a paged list.
 type Options struct {
-	// Items are the pre-rendered rows for the current page, produced by the
-	// caller's own item renderer.
 	Items []template.HTML
 
-	// Page is the current 1-indexed page number.
+	// Page is 1-indexed.
 	Page int
 
-	// TotalPages is the total number of pages available.
 	TotalPages int
 
 	// BaseHref is the path the command bar and search box request against;
@@ -53,17 +49,16 @@ type Options struct {
 
 	// Search enables the search box above the list. Zero value leaves it out.
 	Search Search
+
+	Theme string
 }
 
-// Search configures the optional search box rendered above the list.
 type Search struct {
 	// Enabled turns the search box on. When off, Query/Placeholder are unused.
 	Enabled bool
 
-	// Query is the current search term, reflected back into the input.
 	Query string
 
-	// Placeholder is the input's placeholder text.
 	Placeholder string
 }
 
@@ -83,17 +78,17 @@ type templateOptions struct {
 	SearchQuery   string
 	Placeholder   string
 	BaseHref      string
+	Theme         string
 }
 
-// Render produces the list, command bar, and (if enabled) search box for a
-// single page. The list and command bar are wrapped in a fixed id
-// (resultsID) that the search input and boosted pagination links both
-// target/select, so an htmx response for either can swap in just that
-// region — the search input itself is never replaced.
 func Render(options Options) (template.HTML, error) {
 	base := options.BaseHref
 	if options.Search.Query != "" {
 		base = withQuery(base, options.Search.Query)
+	}
+	theme := "bg-secondary-container text-on-secondary-container"
+	if options.Theme != "" {
+		theme = options.Theme
 	}
 
 	return pagedlistTpl.Render(templateOptions{
@@ -112,10 +107,10 @@ func Render(options Options) (template.HTML, error) {
 		SearchQuery:   options.Search.Query,
 		Placeholder:   options.Search.Placeholder,
 		BaseHref:      options.BaseHref,
+		Theme:         theme,
 	})
 }
 
-// withQuery returns baseHref with its "q" query parameter set to query.
 func withQuery(baseHref, query string) string {
 	u, err := url.Parse(baseHref)
 	if err != nil {
@@ -127,7 +122,6 @@ func withQuery(baseHref, query string) string {
 	return u.String()
 }
 
-// hrefForPage returns baseHref with its "page" query parameter set to page.
 func hrefForPage(baseHref string, page int) string {
 	u, err := url.Parse(baseHref)
 	if err != nil {

@@ -1,0 +1,40 @@
+{{ if .Reveal }}
+<div class="relative" x-data="{ revealed: false }">
+  <input
+    id="{{ .Id }}"
+    name="{{ .Name }}"
+    type="{{ .Type }}"
+    x-bind:type="revealed ? 'text' : '{{ .Type }}'"
+    value="{{ .Value }}"
+    autocomplete="{{ .Autocomplete }}"
+    {{ if .Placeholder }}placeholder="{{ .Placeholder }}"{{ end }}
+    {{ if .Required }}required{{ end }}
+    {{ .DescribedBy }}
+    {{ .Invalid }}
+    {{ .Attrs }}
+    class="field-control pr-10"
+  />
+  <button
+    type="button"
+    x-on:click="revealed = !revealed"
+    x-bind:aria-label="revealed ? 'Hide password' : 'Show password'"
+    class="absolute inset-y-0 right-0 flex items-center px-2 text-on-surface-variant"
+  >
+    <span aria-hidden="true" class="icon icon-opsz-20" x-text="revealed ? 'visibility_off' : 'visibility'"></span>
+  </button>
+</div>
+{{ else }}
+<input
+  id="{{ .Id }}"
+  name="{{ .Name }}"
+  type="{{ .Type }}"
+  value="{{ .Value }}"
+  autocomplete="{{ .Autocomplete }}"
+  {{ if .Placeholder }}placeholder="{{ .Placeholder }}"{{ end }}
+  {{ if .Required }}required{{ end }}
+  {{ .DescribedBy }}
+  {{ .Invalid }}
+  {{ .Attrs }}
+  class="field-control"
+/>
+{{ end }}

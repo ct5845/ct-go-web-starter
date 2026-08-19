@@ -5,6 +5,7 @@ import (
 	"ct-go-web-starter/src/components/demo"
 	_ "embed"
 	"html/template"
+	"time"
 )
 
 // These demos document stylesheets rather than components, so unlike the
@@ -27,13 +28,17 @@ var (
 	buttonsHTML string
 	buttonsTpl  = component.New("buttons.html", buttonsHTML)
 
-	//go:embed menu.html
-	menuHTML string
-	menuTpl  = component.New("menu.html", menuHTML)
+	//go:embed menulist.html
+	menuListHTML string
+	menuListTpl  = component.New("menulist.html", menuListHTML)
 
 	//go:embed meter.html
 	meterHTML string
 	meterTpl  = component.New("meter.html", meterHTML)
+
+	//go:embed htmxindicator.html
+	htmxIndicatorHTML string
+	htmxIndicatorTpl  = component.New("htmxindicator.html", htmxIndicatorHTML)
 )
 
 var typographyPage = demo.Page{
@@ -76,13 +81,13 @@ var buttonsPage = demo.Page{
 	},
 }
 
-var menuPage = demo.Page{
-	Slug:        "menu",
-	Title:       "Menu",
+var menuListPage = demo.Page{
+	Slug:        "menu-list",
+	Title:       "Menu list",
 	Source:      "static/styles/menu.css",
-	Description: "The list container used for grouped links and settings rows.",
+	Description: "The .menu/.menu-item list container used for grouped links and settings rows outside of a popover.",
 	Render: func(demo.Request) (template.HTML, error) {
-		return menuTpl.Render(nil)
+		return menuListTpl.Render(nil)
 	},
 }
 
@@ -93,6 +98,40 @@ var meterPage = demo.Page{
 	Description: "The native meter element, themed across its optimum and sub-optimum ranges.",
 	Render: func(demo.Request) (template.HTML, error) {
 		return meterTpl.Render(nil)
+	},
+}
+
+// htmxIndicatorDelay slows this demo's own response just enough to see the
+// placeholder pulse rather than snap straight to complete on a fast local
+// response.
+const htmxIndicatorDelay = 1500 * time.Millisecond
+
+type htmxIndicatorResult struct {
+	Loaded  bool
+	Content template.HTML
+}
+
+var htmxIndicatorPage = demo.Page{
+	Slug:        "htmx-indicator",
+	Title:       "Htmx indicator",
+	Source:      "static/styles/htmxindicator.css",
+	Description: "The .htmx-indicator utility: hidden until htmx toggles its \"htmx-request\" class on the element an hx-indicator points at, so a swapped-out region can show a placeholder with no JS of its own.",
+	Render: func(request demo.Request) (template.HTML, error) {
+		// The page itself renders instantly with an empty, unloaded result;
+		// its own hx-trigger="load" immediately re-requests with load=true,
+		// so every page view (including a plain refresh) shows the
+		// placeholder for htmxIndicatorDelay before the real content lands.
+		// The loaded response drops hx-trigger="load" from the swapped-in
+		// markup, since re-adding it would re-fire on every swap.
+		if request.Query.Get("load") != "true" {
+			return htmxIndicatorTpl.Render(htmxIndicatorResult{})
+		}
+
+		time.Sleep(htmxIndicatorDelay)
+		return htmxIndicatorTpl.Render(htmxIndicatorResult{
+			Loaded:  true,
+			Content: template.HTML("Loaded at " + time.Now().Format("15:04:05.000")),
+		})
 	},
 }
 

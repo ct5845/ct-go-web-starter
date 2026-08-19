@@ -1,0 +1,13 @@
+<label for="{{ .Id }}" class="combobox-option menu-item cursor-pointer">
+  <input
+    type="{{ .Type }}"
+    id="{{ .Id }}"
+    name="{{ .Name }}"
+    value="{{ .Value }}"
+    {{ if .Checked }}checked{{ end }}
+    data-label="{{ .Label }}"
+    class="field-control sr-only"
+  />
+  <span class="grow">{{ .Label }}</span>
+  <span aria-hidden="true" class="icon icon-fill-1 combobox-check">check_circle</span>
+</label>

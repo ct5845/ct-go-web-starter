@@ -3,13 +3,25 @@ package showcase
 import (
 	"ct-go-web-starter/src/components/bottomsheet"
 	"ct-go-web-starter/src/components/bottomtabs"
+	"ct-go-web-starter/src/components/checkboxgroup"
+	"ct-go-web-starter/src/components/combobox"
 	"ct-go-web-starter/src/components/component"
+	"ct-go-web-starter/src/components/datetimeinput"
 	"ct-go-web-starter/src/components/demo"
+	"ct-go-web-starter/src/components/dialog"
+	"ct-go-web-starter/src/components/dropdown"
 	"ct-go-web-starter/src/components/icon"
 	"ct-go-web-starter/src/components/layoutswitch"
+	"ct-go-web-starter/src/components/menu"
 	"ct-go-web-starter/src/components/page"
 	"ct-go-web-starter/src/components/pagedlist"
+	"ct-go-web-starter/src/components/pageloader"
+	"ct-go-web-starter/src/components/radiogroup"
 	"ct-go-web-starter/src/components/sidebar"
+	"ct-go-web-starter/src/components/tabs"
+	"ct-go-web-starter/src/components/textarea"
+	"ct-go-web-starter/src/components/textinput"
+	"ct-go-web-starter/src/components/toggle"
 	"ct-go-web-starter/src/features/nav"
 	"ct-go-web-starter/src/infrastructure/reqlog"
 	_ "embed"
@@ -24,17 +36,30 @@ import (
 // the component's own package; the stylesheet demos live in styles.go because
 // they have no package to sit alongside.
 var demos = []demo.Page{
-	typographyPage,
-	colorsPage,
-	spacingPage,
+	bottomsheet.Showcase,
+	bottomtabs.Showcase,
 	buttonsPage,
+	checkboxgroup.Showcase,
+	colorsPage,
+	combobox.Showcase,
+	datetimeinput.Showcase,
+	dialog.Showcase,
+	dropdown.Showcase,
+	htmxIndicatorPage,
 	icon.Showcase,
-	menuPage,
+	menu.Showcase,
+	menuListPage,
 	meterPage,
 	pagedlist.Showcase,
+	pageloader.Showcase,
+	radiogroup.Showcase,
 	sidebar.Showcase,
-	bottomtabs.Showcase,
-	bottomsheet.Showcase,
+	spacingPage,
+	tabs.Showcase,
+	textarea.Showcase,
+	textinput.Showcase,
+	toggle.Showcase,
+	typographyPage,
 }
 
 func lookup(slug string) (demo.Page, bool) {
@@ -112,91 +137,154 @@ var (
 	//go:embed demo.html
 	demoHTML string
 	demoTpl  = component.New("demo.html", demoHTML)
-
-	//go:embed demolink.html
-	demoLinkHTML string
-	demoLinkTpl  = component.New("demolink.html", demoLinkHTML)
 )
 
+// indexSection is one heading and its items on the showcase index. Pages
+// with no Group each get their own section with an empty Label; grouped
+// pages share one section under their Group name, in the tabs' order.
+type indexSection struct {
+	Label string
+	Items []template.HTML
+}
+
 func renderIndex() (template.HTML, error) {
-	items := make([]template.HTML, len(demos))
-	for i, d := range demos {
+	sections := make([]indexSection, 0, len(demos))
+	groupIndex := make(map[string]int)
+	for _, d := range demos {
 		item, err := indexItemTpl.Render(d)
 		if err != nil {
 			return "", fmt.Errorf("showcase index: render item %q: %w", d.Slug, err)
 		}
-		items[i] = item
+
+		if d.Group == "" {
+			sections = append(sections, indexSection{Items: []template.HTML{item}})
+			continue
+		}
+
+		if i, ok := groupIndex[d.Group]; ok {
+			sections[i].Items = append(sections[i].Items, item)
+			continue
+		}
+
+		groupIndex[d.Group] = len(sections)
+		sections = append(sections, indexSection{Label: d.Group, Items: []template.HTML{item}})
 	}
 
-	content, err := indexTpl.Render(struct{ Items []template.HTML }{items})
+	content, err := indexTpl.Render(struct{ Sections []indexSection }{sections})
 	if err != nil {
 		return "", fmt.Errorf("showcase index: render content: %w", err)
 	}
 
-	return renderPage("Showcase", "Every component in this starter, on its own page", content)
-}
-
-type demoLinkProps struct {
-	Slug        string
-	Title       string
-	Class       string
-	AriaCurrent template.HTMLAttr
+	return renderPage("Showcase", "Every component in this starter, on its own page", content, true)
 }
 
 type demoOptions struct {
 	Title       string
 	Source      string
 	Description string
-	Links       []template.HTML
+	Nav         template.HTML
+	Group       string
+	GroupNav    template.HTML
 	Content     template.HTML
 }
 
-func renderDemoPage(current demo.Page, content template.HTML) (template.HTML, error) {
-	links := make([]template.HTML, len(demos))
-	for i, d := range demos {
-		props := demoLinkProps{
-			Slug:  d.Slug,
-			Title: d.Title,
-			Class: "btn btn-outline whitespace-nowrap text-on-surface-variant",
+// groupHref links a group's primary tab to its first member, so picking
+// "Inputs" lands somewhere real rather than a dead group-only page.
+func groupHref(group string) string {
+	for _, d := range demos {
+		if d.Group == group {
+			return "/showcase/" + d.Slug
 		}
-		if d.Slug == current.Slug {
-			props.Class = "btn btn-outline whitespace-nowrap bg-primary-container text-on-primary-container font-bold"
-			props.AriaCurrent = `aria-current="page"`
-		}
+	}
+	return "/showcase"
+}
 
-		link, err := demoLinkTpl.Render(props)
-		if err != nil {
-			return "", fmt.Errorf("showcase: render link %q: %w", d.Slug, err)
+func renderDemoPage(current demo.Page, content template.HTML) (template.HTML, error) {
+	demoTabs := make([]tabs.Tab, 0, len(demos)+1)
+	demoTabs = append(demoTabs, tabs.Tab{Label: "All", Href: "/showcase"})
+	seenGroups := make(map[string]bool)
+	for _, d := range demos {
+		if d.Group != "" {
+			if seenGroups[d.Group] {
+				continue
+			}
+			seenGroups[d.Group] = true
+			demoTabs = append(demoTabs, tabs.Tab{
+				Label:  d.Group,
+				Href:   groupHref(d.Group),
+				Active: d.Group == current.Group,
+			})
+			continue
 		}
-		links[i] = link
+		demoTabs = append(demoTabs, tabs.Tab{
+			Label:  d.Title,
+			Href:   "/showcase/" + d.Slug,
+			Active: d.Slug == current.Slug,
+		})
+	}
+
+	nav, err := tabs.Render(tabs.Options{Axis: tabs.Horizontal, Tabs: demoTabs})
+	if err != nil {
+		return "", fmt.Errorf("showcase: render nav: %w", err)
+	}
+
+	var groupNav template.HTML
+	if current.Group != "" {
+		groupTabs := make([]tabs.Tab, 0, len(demos))
+		for _, d := range demos {
+			if d.Group != current.Group {
+				continue
+			}
+			groupTabs = append(groupTabs, tabs.Tab{
+				Label:  d.Title,
+				Href:   "/showcase/" + d.Slug,
+				Active: d.Slug == current.Slug,
+			})
+		}
+		groupNav, err = tabs.Render(tabs.Options{Axis: tabs.Horizontal, Tabs: groupTabs})
+		if err != nil {
+			return "", fmt.Errorf("showcase: render group nav: %w", err)
+		}
 	}
 
 	body, err := demoTpl.Render(demoOptions{
 		Title:       current.Title,
 		Source:      current.Source,
 		Description: current.Description,
-		Links:       links,
+		Nav:         nav,
+		Group:       current.Group,
+		GroupNav:    groupNav,
 		Content:     content,
 	})
 	if err != nil {
 		return "", fmt.Errorf("showcase %q: render demo: %w", current.Slug, err)
 	}
 
-	return renderPage(current.Title, current.Description, body)
+	return renderPage(current.Title, current.Description, body, false)
 }
 
-func renderPage(title, description string, content template.HTML) (template.HTML, error) {
+func renderPage(title, description string, content template.HTML, switchlayout bool) (template.HTML, error) {
 	navigation, err := nav.Render("showcase")
 	if err != nil {
 		return "", fmt.Errorf("showcase page: render navigation: %w", err)
 	}
 
-	return layoutswitch.RenderPage(page.Options{
+	pageOptions := page.Options{
 		Title:           title,
 		MetaDescription: description,
-	}, layoutswitch.Options{
+	}
+
+	var bottomTabs template.HTML
+
+	if switchlayout {
+		bottomTabs = navigation.Footer
+	} else {
+		bottomTabs = ""
+	}
+
+	return layoutswitch.RenderPage(pageOptions, layoutswitch.Options{
 		Content:    content,
-		BottomTabs: navigation.Footer,
+		BottomTabs: bottomTabs,
 		SideBar:    navigation.SideBar,
 	})
 }

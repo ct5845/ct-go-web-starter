@@ -1,0 +1,21 @@
+<div class="relative">
+  <select
+    id="{{ .Id }}"
+    name="{{ .Name }}"
+    {{ if .Required }}required{{ end }}
+    {{ .DescribedBy }}
+    {{ .Invalid }}
+    class="field-control dropdown-select pr-10"
+  >
+    {{ if .Placeholder }}
+    <option value="" disabled selected hidden>{{ .Placeholder }}</option>
+    {{ end }} {{ range .Items }}
+    <option value="{{ .Value }}" {{ if .Selected }}selected{{ end }}>{{ .Label }}</option>
+    {{ end }}
+  </select>
+  <span
+    aria-hidden="true"
+    class="icon absolute right-2 top-2 text-on-surface-variant pointer-events-none"
+    >arrow_drop_down</span
+  >
+</div>

@@ -1,0 +1,8 @@
+.dropdown-select {
+  appearance: none;
+  background-image: none;
+}
+
+.dropdown-select::-ms-expand {
+  display: none;
+}

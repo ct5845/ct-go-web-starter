@@ -60,6 +60,58 @@
     <script defer src="/static/htmx.min.js"></script>
     <script defer src="/static/alpine.min.js"></script>
     <script>
+      // Field-level behaviour shared by every field wrapper (field's own
+      // <div>, and radiogroup/checkboxgroup's <fieldset>), registered
+      // globally here rather than in any one component's own script, since a
+      // page can render those without ever calling field.Render.
+
+      // On input (every keystroke): a server-rendered error is a fact about
+      // the value the server last saw. Once the user edits it, the fact is
+      // stale — clear it optimistically rather than leave a red error
+      // standing that may no longer be true. The authoritative answer comes
+      // back from the next real validation (blur-triggered request, or a
+      // full submit), which re-renders the field from scratch if the error
+      // still applies.
+      document.addEventListener("input", function (event) {
+        var control = event.target.closest(".field-control");
+        if (!control) return;
+
+        var field = control.closest(".field[data-invalid='true']");
+        if (!field) return;
+
+        field.removeAttribute("data-invalid");
+        control.removeAttribute("aria-invalid");
+
+        var error = field.querySelector('[role="alert"]');
+        if (error) {
+          var describedBy = (control.getAttribute("aria-describedby") || "")
+            .split(/\s+/)
+            .filter(function (id) {
+              return id && id !== error.id;
+            });
+          if (describedBy.length) {
+            control.setAttribute("aria-describedby", describedBy.join(" "));
+          } else {
+            control.removeAttribute("aria-describedby");
+          }
+          error.remove();
+        }
+      });
+
+      // On change (commit, not every keystroke): backs every field wrapper's
+      // x-data, dispatching "field-change" ({ id, value }) for other fields
+      // to listen for with x-on:field-change.window.
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("inputControl", (id) => ({
+          id,
+
+          change(event) {
+            this.$dispatch("field-change", { id: this.id, value: event.target.value });
+          },
+        }));
+      });
+    </script>
+    <script>
       if ("serviceWorker" in navigator) {
         {{ if .IsDev }}
           navigator.serviceWorker.getRegistrations().then(function (regs) {

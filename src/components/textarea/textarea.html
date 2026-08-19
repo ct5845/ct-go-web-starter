@@ -1,0 +1,11 @@
+<textarea
+  id="{{ .Id }}"
+  name="{{ .Name }}"
+  rows="{{ .Rows }}"
+  {{ if .Placeholder }}placeholder="{{ .Placeholder }}"{{ end }}
+  {{ if .Required }}required{{ end }}
+  {{ .DescribedBy }}
+  {{ .Invalid }}
+  {{ .Attrs }}
+  class="field-control"
+>{{ .Value }}</textarea>

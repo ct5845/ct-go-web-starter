@@ -1,0 +1,34 @@
+.toggle .toggle-on,
+.toggle .toggle-off {
+  @apply text-3xl leading-none;
+}
+
+.toggle .toggle-on {
+  @apply text-primary;
+}
+
+.toggle:has(input:focus-visible) .toggle-on,
+.toggle:has(input:focus-visible) .toggle-off {
+  @apply outline-2 outline-offset-2 outline-primary rounded-full;
+}
+
+/* display:none by default; toggle-on shows once checked, toggle-off shows
+   otherwise. Scoped under .toggle rather than a bare class: icon.css's own
+   unlayered `.icon { display: inline-block }` ties on specificity with a
+   bare class selector, so which one wins comes down to @import order rather
+   than intent — see radiogroup.css for the same fix. */
+.toggle .toggle-on {
+  display: none;
+}
+
+.toggle:has(input:checked) .toggle-on {
+  display: inline-flex;
+}
+
+.toggle .toggle-off {
+  display: inline-flex;
+}
+
+.toggle:has(input:checked) .toggle-off {
+  display: none;
+}
