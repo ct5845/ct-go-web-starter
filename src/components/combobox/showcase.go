@@ -113,7 +113,7 @@ func renderShowcase(request demo.Request) (template.HTML, error) {
 	}
 
 	return demo.Frame(demo.FrameOptions{
-		Note:    "Both share the same search box wiring as the paged list: typing debounces an htmx request that swaps just the option list inside the open popover, matching on this showcase's fixed 48-country list server-side. Scrolling to the bottom loads the next 20 matches the same way. Selected items that aren't on the loaded page are pinned above it, so the current selection is always visible. Country is single-select (radio); Visited is multi-select (checkbox) and shows every pick in the trigger.",
+		Note:    "Both share the same search box wiring as the paged list: typing debounces an htmx request that swaps just the option list inside the open popover, matching on this showcase's fixed 48-country list server-side. Scrolling to the bottom loads the next 20 matches the same way. A selected item not yet on the loaded page still submits via a hidden input, so the trigger and the form stay correct even before its page loads. Country is single-select (radio); Visited is multi-select (checkbox) and shows every pick in the trigger.",
 		Class:   "max-w-md flex flex-col gap-6",
 		Content: single + multi,
 	})

@@ -10,7 +10,7 @@ Alpine.data("combobox", (id, multi) => ({
     // outerHTML swap, which replaces the #resultsId-page node itself
     // rather than mutating it in place.
     const results = document.getElementById(this.resultsId);
-    new MutationObserver(() => this.dropLoadedPins()).observe(results, {
+    new MutationObserver(() => this.dropLoadedHiddenOptions()).observe(results, {
       childList: true,
       subtree: true,
     });
@@ -37,21 +37,17 @@ Alpine.data("combobox", (id, multi) => ({
     });
   },
 
-  // A pinned row (a selected item not yet on any loaded page) duplicates
-  // the real row once its page loads — same name/value, so checking one
-  // natively unchecks the other, but both would stay visible. Drop the
-  // pinned copy once the real row is on the page.
-  dropLoadedPins() {
-    const pinned = document.getElementById(this.resultsId + "-pinned");
-    if (!pinned) return;
-
+  // A hidden option (a selected item not yet on any loaded page) submits
+  // the same name/value as its eventual visible row. Once that row loads,
+  // drop the hidden one so a later uncheck of the visible row can't be
+  // silently overridden by the hidden duplicate still being checked.
+  dropLoadedHiddenOptions() {
     const loadedValues = new Set(
       Array.from(document.querySelectorAll("#" + this.resultsId + "-page input")).map((input) => input.value),
     );
-    pinned.querySelectorAll(".combobox-option").forEach((option) => {
-      const input = option.querySelector("input");
+    document.querySelectorAll("#" + this.resultsId + " [data-hidden-option]").forEach((input) => {
       if (loadedValues.has(input.value)) {
-        option.remove();
+        input.remove();
       }
     });
   },

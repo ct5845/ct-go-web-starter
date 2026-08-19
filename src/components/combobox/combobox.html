@@ -46,9 +46,7 @@
     >
       {{ if .ResultsNote }}
       <p class="text-xs text-on-surface-variant p-2">{{ .ResultsNote }}</p>
-      {{ end }} {{ if .Pinned }}
-      <div id="{{ .ResultsId }}-pinned" class="border-b border-outline-variant">{{ range .Pinned }}{{ . }}{{ end }}</div>
-      {{ end }}
+      {{ end }} {{ range .HiddenOptions }}{{ . }}{{ end }}
       <div id="{{ .ResultsId }}-page" data-next-page-href="{{ .NextPageHref }}">
         {{ range .Results }}{{ . }}{{ end }}
       </div>

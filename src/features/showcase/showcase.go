@@ -136,17 +136,38 @@ var (
 	demoTpl  = component.New("demo.html", demoHTML)
 )
 
+// indexSection is one heading and its items on the showcase index. Pages
+// with no Group each get their own section with an empty Label; grouped
+// pages share one section under their Group name, in the tabs' order.
+type indexSection struct {
+	Label string
+	Items []template.HTML
+}
+
 func renderIndex() (template.HTML, error) {
-	items := make([]template.HTML, len(demos))
-	for i, d := range demos {
+	sections := make([]indexSection, 0, len(demos))
+	groupIndex := make(map[string]int)
+	for _, d := range demos {
 		item, err := indexItemTpl.Render(d)
 		if err != nil {
 			return "", fmt.Errorf("showcase index: render item %q: %w", d.Slug, err)
 		}
-		items[i] = item
+
+		if d.Group == "" {
+			sections = append(sections, indexSection{Items: []template.HTML{item}})
+			continue
+		}
+
+		if i, ok := groupIndex[d.Group]; ok {
+			sections[i].Items = append(sections[i].Items, item)
+			continue
+		}
+
+		groupIndex[d.Group] = len(sections)
+		sections = append(sections, indexSection{Label: d.Group, Items: []template.HTML{item}})
 	}
 
-	content, err := indexTpl.Render(struct{ Items []template.HTML }{items})
+	content, err := indexTpl.Render(struct{ Sections []indexSection }{sections})
 	if err != nil {
 		return "", fmt.Errorf("showcase index: render content: %w", err)
 	}

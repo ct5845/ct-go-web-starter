@@ -21,6 +21,10 @@ var (
 	//go:embed option.html
 	optionHTML string
 	optionTpl  = component.New("option.html", optionHTML)
+
+	//go:embed hidden-option.html
+	hiddenOptionHTML string
+	hiddenOptionTpl  = component.New("hidden-option.html", hiddenOptionHTML)
 )
 
 // Option is one search result. Id must be unique across the page, since it
@@ -58,8 +62,9 @@ type Options struct {
 	// of paging or search — the caller must supply these on every render
 	// (e.g. by looking them up by id), since a selection made on an earlier
 	// page won't otherwise appear once search or scroll has moved past it.
-	// Any entry not already present in Results is pinned above it, so the
-	// popover always shows what's picked even before its own page loads.
+	// Any entry not already present in Results submits via a hidden input
+	// instead (see hidden-option.html), so the form always carries the full
+	// selection even before the matching page loads.
 	Selected []Option
 
 	Results     []Option
@@ -112,23 +117,23 @@ func pageHref(baseHref, query string, page int) string {
 }
 
 type templateOptions struct {
-	Id           string
-	Name         string
-	Label        string
-	Placeholder  string
-	Multi        bool
-	InputType    string
-	SelectedText string
-	ResultsId    string
-	Pinned       []template.HTML
-	Results      []template.HTML
-	Query        string
-	BaseHref     string
-	NextPageHref string
-	ResultsNote  string
-	Required     bool
-	DescribedBy  template.HTMLAttr
-	Invalid      template.HTMLAttr
+	Id            string
+	Name          string
+	Label         string
+	Placeholder   string
+	Multi         bool
+	InputType     string
+	SelectedText  string
+	ResultsId     string
+	HiddenOptions []template.HTML
+	Results       []template.HTML
+	Query         string
+	BaseHref      string
+	NextPageHref  string
+	ResultsNote   string
+	Required      bool
+	DescribedBy   template.HTMLAttr
+	Invalid       template.HTMLAttr
 }
 
 func Render(options Options) (template.HTML, error) {
@@ -148,21 +153,20 @@ func Render(options Options) (template.HTML, error) {
 		onPage[o.Value] = true
 	}
 
-	var pinned []template.HTML
+	// A selected item not on the loaded page still needs to submit, so it
+	// gets a hidden input outside the visible list rather than a styled
+	// row — see hidden-option.html. Once the real row loads (matched by
+	// value in combobox.js), the hidden one is removed.
+	var hiddenOptions []template.HTML
 	for _, o := range options.Selected {
 		if onPage[o.Value] {
 			continue
 		}
-		// Pinned rows use a distinct DOM id from the same Option's eventual
-		// page row, since the real row appears later once its page loads
-		// (see dropLoadedPins in combobox.js) — both would otherwise carry
-		// the same id while both exist in the DOM. Name stays options.Name
-		// so the pinned input still submits under the right field.
-		rendered, err := o.renderPinned(options.Id, options.Name, inputType)
+		rendered, err := o.renderHidden(options.Id, options.Name, inputType)
 		if err != nil {
 			return "", err
 		}
-		pinned = append(pinned, rendered)
+		hiddenOptions = append(hiddenOptions, rendered)
 	}
 
 	results := make([]template.HTML, len(options.Results))
@@ -192,23 +196,23 @@ func Render(options Options) (template.HTML, error) {
 	}
 
 	input, err := comboboxTpl.Render(templateOptions{
-		Id:           options.Id,
-		Name:         options.Name,
-		Label:        options.Label,
-		Placeholder:  options.Placeholder,
-		Multi:        options.Multi,
-		InputType:    inputType,
-		SelectedText: selectedText,
-		ResultsId:    ResultsId(options.Id),
-		Pinned:       pinned,
-		Results:      results,
-		Query:        options.Query,
-		BaseHref:     options.BaseHref,
-		NextPageHref: nextPageHref,
-		ResultsNote:  options.ResultsNote,
-		Required:     options.Required,
-		DescribedBy:  described.DescribedBy,
-		Invalid:      described.Invalid,
+		Id:            options.Id,
+		Name:          options.Name,
+		Label:         options.Label,
+		Placeholder:   options.Placeholder,
+		Multi:         options.Multi,
+		InputType:     inputType,
+		SelectedText:  selectedText,
+		ResultsId:     ResultsId(options.Id),
+		HiddenOptions: hiddenOptions,
+		Results:       results,
+		Query:         options.Query,
+		BaseHref:      options.BaseHref,
+		NextPageHref:  nextPageHref,
+		ResultsNote:   options.ResultsNote,
+		Required:      options.Required,
+		DescribedBy:   described.DescribedBy,
+		Invalid:       described.Invalid,
 	})
 	if err != nil {
 		return "", err
@@ -245,15 +249,16 @@ func (o Option) render(comboboxId, name, inputType string, checked bool) (templa
 	})
 }
 
-// renderPinned is always checked — a pinned row only ever exists to show a
-// current selection that isn't on the loaded page yet.
-func (o Option) renderPinned(comboboxId, name, inputType string) (template.HTML, error) {
-	return optionTpl.Render(optionProps{
-		Id:      comboboxId + "-pinned-option-" + o.Id,
-		Name:    name,
-		Type:    inputType,
-		Value:   o.Value,
-		Label:   o.Label,
-		Checked: true,
+// renderHidden submits a selection that isn't on the loaded page yet — see
+// hidden-option.html. combobox.js matches it to its eventual visible row by
+// value (its id is distinct, since both can briefly coexist in the DOM
+// until combobox.js removes this one once that row loads).
+func (o Option) renderHidden(comboboxId, name, inputType string) (template.HTML, error) {
+	return hiddenOptionTpl.Render(optionProps{
+		Id:    comboboxId + "-hidden-option-" + o.Id,
+		Name:  name,
+		Type:  inputType,
+		Value: o.Value,
+		Label: o.Label,
 	})
 }
