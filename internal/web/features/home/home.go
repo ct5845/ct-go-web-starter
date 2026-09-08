@@ -1,0 +1,60 @@
+package home
+
+import (
+	"ct-go-web-starter/internal/infrastructure/reqlog"
+	"ct-go-web-starter/internal/web/components/component"
+	"ct-go-web-starter/internal/web/components/layoutswitch"
+	"ct-go-web-starter/internal/web/components/page"
+	"ct-go-web-starter/internal/web/features/nav"
+	_ "embed"
+	"fmt"
+	"html/template"
+	"io"
+	"log/slog"
+	"net/http"
+)
+
+//go:embed home.html
+var homeHTML string
+var homeTmpl = component.New("home.html", homeHTML)
+
+func RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("GET /{$}", HandleGet)
+}
+
+func HandleGet(w http.ResponseWriter, r *http.Request) {
+	defer reqlog.Track(r.Context(), "home.HandleGet", "")()
+	page, err := render()
+
+	if err != nil {
+		slog.Error("Failed to render home page", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	io.WriteString(w, string(page))
+}
+
+func render() (template.HTML, error) {
+	content, err := homeTmpl.Render(map[string]any{
+		"Title":       "CT Go Web Starter",
+		"Description": "A modern Go web application starter with HTMX, Alpine.js, and TailwindCSS",
+	})
+	if err != nil {
+		return "", fmt.Errorf("home page: render content: %w", err)
+	}
+
+	navigation, err := nav.Render("home")
+	if err != nil {
+		return "", fmt.Errorf("home page: render navigation: %w", err)
+	}
+
+	return layoutswitch.RenderPage(page.Options{
+		Title:           "CT Go Web Starter",
+		MetaDescription: "A modern Go web application starter with HTMX, Alpine.js, and TailwindCSS",
+	}, layoutswitch.Options{
+		Content:    content,
+		BottomTabs: navigation.Footer,
+		SideBar:    navigation.SideBar,
+	})
+}

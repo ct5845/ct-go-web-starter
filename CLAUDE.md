@@ -21,19 +21,67 @@ Prefer clear, descriptive names for variables, functions, and types over short n
 
 ## Project Structure
 
-`src/` has three top-level directories. Keep it that way — do not add new top-level directories without good reason.
+The application is one Go module with three binaries under `cmd/`, all built on
+one shared package tree under `internal/`.
 
-- `features/` — one subdirectory per user-facing feature (e.g. `features/home/`); features have an HTTP surface (handler + routes)
-- `components/` — UI building blocks with no HTTP surface (`components/component/`, `components/page/`, `components/icon/`, etc.)
-- `infrastructure/` — platform and runtime concerns with no feature or UI logic (`infrastructure/fileserver/`, `infrastructure/config/`, `infrastructure/compression/`)
+```
+cmd/web/          server-rendered htmx + Alpine app
+cmd/api/          JSON transport
+cmd/mcp/          MCP transport (streamable HTTP)
 
-The rule for placement is simple: if it has a route, it's a feature. If it's a UI building block with no HTTP surface, it's a component. If it's a platform/runtime concern, it's infrastructure.
+tools/copyassets.mjs  build step: static assets and npm libs into tmp/
 
-Feature-internal components (used only within one feature) live in the feature directory and are unexported. Components used across features live in `src/components/`.
+internal/service/          domain types and operations
+internal/web/              everything cmd/web needs
+  features/                one subdirectory per user-facing feature
+  components/              UI building blocks with no HTTP surface
+  static/                  stylesheets, images, fonts
+internal/api/              JSON handlers
+internal/mcpserver/        MCP tool definitions
+internal/infrastructure/   platform and runtime concerns (config, logging,
+                           health, metrics, compression, static files)
+```
 
-Every component in `src/components/` has a showcase page rendering it in isolation from any feature. The demo lives *in the component's own directory* as `showcase.go` (plus any templates it needs), exporting `var Showcase = demo.Page{...}`. A component and its demo therefore change together, in the same diff.
+`cmd/` holds only what gets deployed, so `./cmd/...` is the whole shipped
+surface. Programs that exist to build the project live in `tools/` and are never
+part of an image.
 
-`src/features/showcase/` owns only the routes, the index, and the page chrome; it collects the exported `Showcase` values into its running order. Demos for stylesheets rather than components — typography, colours, spacing, buttons, menu, meter — have no package to sit alongside, so they stay in the feature.
+### The rule that matters
+
+**`internal/service` imports nothing else under `internal/`.** It holds the
+domain types and operations; `web`, `api` and `mcpserver` all point inward at
+it. Each transport is thin — it translates a request into a service call and a
+service result into its own idiom. If `service` ever needs to import a
+transport or a store, the dependency has gone the wrong way round.
+
+The web app binds the service directly. It does not call its own API: the Go
+interface is already the contract, and routing page renders through HTTP would
+add a network hop and a second failure mode for nothing.
+
+Domain errors are UI states, so they are typed values (`service.ErrEmptyName`)
+that each transport translates — a 400 in `api`, a tool-level error in
+`mcpserver`, a message on the page in `web`. A refusal must never become a 500.
+
+### Placement
+
+- Has a route and renders HTML? A feature, in `internal/web/features/`.
+- Has a route and returns JSON? A handler in `internal/api/`.
+- An LLM-callable tool? `internal/mcpserver/`.
+- A UI building block with no HTTP surface? `internal/web/components/`.
+- Domain type or operation, with no transport in it? `internal/service/`.
+- Platform or runtime concern, with no feature or UI logic? `internal/infrastructure/`.
+
+Do not add new top-level directories under `internal/` without good reason.
+
+Feature-internal components (used only within one feature) live in the feature
+directory and are unexported. Components used across features live in
+`internal/web/components/`.
+
+### Showcase
+
+Every component in `internal/web/components/` has a showcase page rendering it in isolation from any feature. The demo lives *in the component's own directory* as `showcase.go` (plus any templates it needs), exporting `var Showcase = demo.Page{...}`. A component and its demo therefore change together, in the same diff.
+
+`internal/web/features/showcase/` owns only the routes, the index, and the page chrome; it collects the exported `Showcase` values into its running order. Demos for stylesheets rather than components — typography, colours, spacing, buttons, menu, meter — have no package to sit alongside, so they stay in the feature.
 
 When you add or change a shared component, add or update its showcase page in the same change. It is where the component gets designed and reviewed.
 
@@ -45,11 +93,13 @@ When you add or change a shared component, add or update its showcase page in th
 
 ## Testing
 
-Do not write tests by default. Add a test when there is a genuine reason: the function has multiple edge cases that are non-obvious, the output is hard to verify through normal use, or a bug has been fixed and regression coverage is valuable. Do not test functions simply to confirm they work — if the behaviour is obvious and a manual run through the app would surface any breakage, a test adds noise without value. When tests are warranted, use table-driven tests for functions with multiple input/output cases.
+Add a test when there is a genuine reason: the function has multiple edge cases that are non-obvious, the output is hard to verify through normal use, or a bug has been fixed and regression coverage is valuable. Do not test functions simply to confirm they work — if the behaviour is obvious and a manual run through the app would surface any breakage, a test adds noise without value. When tests are warranted, use table-driven tests for functions with multiple input/output cases.
 
 ## Verifying Changes
 
-Do not launch the web server (`go run ./cmd/web`) to verify a change. A dev instance is normally already running on the default port; a second `go run` will either fail to bind or fight over it. Verify with `go build ./...` / `go vet ./...`, and ask the user to check the running instance for anything that needs visual or browser confirmation.
+Do not launch the web server (`go run ./cmd/web`) to verify a change. A dev instance is normally already running on the default port; a second `go run` will either fail to bind or fight over it. Verify with `go build ./...` / `go vet ./...` (or `make test`), and ask the user to check the running instance for anything that needs visual or browser confirmation.
+
+`cmd/api` and `cmd/mcp` have no dev instance, so they can be run directly to check a change — they default to ports 8081 and 8082.
 
 ## Keep It Simple
 

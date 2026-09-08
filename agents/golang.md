@@ -20,7 +20,7 @@ Only use `New` as a constructor prefix when initialisation is non-trivial. A pla
 
 Do not create `utils`, `helpers`, `types`, or `models` packages. Name packages by what they provide. Keep types next to the code that owns them.
 
-Before writing new helper code, check whether a package already exists in `src/` that covers the need. Reuse it rather than duplicating locally.
+Before writing new helper code, check whether a package already exists in `internal/` that covers the need. Reuse it rather than duplicating locally.
 
 ## Comments
 
@@ -68,7 +68,7 @@ For streaming responses, where a long wall-clock time is expected rather than a 
 
 ## Routing
 
-All routes are wired up in `routes()` in `cmd/web/main.go`, using `http.NewServeMux()` from the standard library. Do not introduce a third-party router.
+Each binary wires its own routes in `routes()` in its `main.go`, using `http.NewServeMux()` from the standard library. Do not introduce a third-party router. `cmd/web` mounts the web features, `cmd/api` the JSON handlers; both mount `health`.
 
 Each feature exposes a single `RegisterRoutes(mux *http.ServeMux)` function that registers its own patterns, and `routes()` calls it:
 
@@ -78,6 +78,8 @@ func routes() *http.ServeMux {
 
 	home.RegisterRoutes(mux)
 	showcase.RegisterRoutes(mux)
+	mcpconnector.RegisterRoutes(mux)
+	health.RegisterRoutes(mux)
 	fileserver.RegisterRoutes(mux, "tmp/static/")
 
 	return mux
@@ -113,7 +115,7 @@ homeTmpl.Render("WelcomeCardHTML", welcomeCardHTML)
 
 Simple features live in a single file (e.g. `home.go`) that contains the route registration, HTTP handler, and page assembly together. Only split into `handler.go` + `page.go` when there is substantial assembly work — multiple subcomponents, complex data preparation — that would make a single file unwieldy.
 
-See `src/features/home/home.go` for a working example of the single-file pattern.
+See `internal/web/features/home/home.go` for a working example of the single-file pattern.
 
 ## Component APIs
 
@@ -168,4 +170,4 @@ and reuse the value — don't push the variation into the component.
 var primaryItems = []primaryItem{...}
 ```
 
-See `src/features/nav/homenav.go` for this pattern in use.
+See `internal/web/features/nav/homenav.go` for this pattern in use.

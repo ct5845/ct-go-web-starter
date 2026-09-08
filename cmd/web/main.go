@@ -1,19 +1,21 @@
 package main
 
 import (
-	"context"
-	"ct-go-web-starter/src/features/home"
-	"ct-go-web-starter/src/features/showcase"
-	"ct-go-web-starter/src/infrastructure/compression"
-	"ct-go-web-starter/src/infrastructure/config"
-	"ct-go-web-starter/src/infrastructure/fileserver"
-	"ct-go-web-starter/src/infrastructure/reqlog"
+	"ct-go-web-starter/internal/infrastructure/compression"
+	"ct-go-web-starter/internal/infrastructure/config"
+	"ct-go-web-starter/internal/infrastructure/fileserver"
+	"ct-go-web-starter/internal/infrastructure/health"
+	"ct-go-web-starter/internal/infrastructure/httpserver"
+	"ct-go-web-starter/internal/infrastructure/metrics"
+	"ct-go-web-starter/internal/infrastructure/reqlog"
+	"ct-go-web-starter/internal/service"
+	"ct-go-web-starter/internal/web/features/home"
+	"ct-go-web-starter/internal/web/features/mcpconnector"
+	"ct-go-web-starter/internal/web/features/notfound"
+	"ct-go-web-starter/internal/web/features/showcase"
 	"log/slog"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -22,7 +24,18 @@ func main() {
 	godotenv.Load()
 	config.Load()
 	config.InitLogging()
-	run()
+
+	metrics.Serve(":" + config.MetricsPort("9090"))
+
+	addr := ":" + config.Port("8080")
+	handler := reqlog.Middleware()(compression.Middleware()(routes()))
+
+	slog.Info("Web server starting", "addr", "http://localhost"+addr, "version", service.Version)
+
+	if err := httpserver.Run(addr, handler); err != nil {
+		slog.Error("Web server error", "error", err)
+		os.Exit(1)
+	}
 }
 
 func routes() *http.ServeMux {
@@ -30,7 +43,10 @@ func routes() *http.ServeMux {
 
 	home.RegisterRoutes(mux)
 	showcase.RegisterRoutes(mux)
+	mcpconnector.RegisterRoutes(mux)
+	health.RegisterRoutes(mux)
 	fileserver.RegisterRoutes(mux, "tmp/static/")
+	notfound.RegisterRoutes(mux)
 
 	mux.HandleFunc("GET /favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		reqlog.Skip(r.Context())
@@ -43,39 +59,4 @@ func routes() *http.ServeMux {
 	})
 
 	return mux
-}
-
-func run() {
-	mux := routes()
-
-	handler := reqlog.Middleware()(compression.Middleware()(mux))
-
-	server := &http.Server{
-		Addr:    ":" + config.Port,
-		Handler: handler,
-	}
-
-	slog.Info("Server starting", "addr", "http://localhost:"+config.Port)
-
-	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Error("Server error", "error", err)
-			os.Exit(1)
-		}
-	}()
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
-	slog.Info("Server shutting down")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		slog.Error("Shutdown error", "error", err)
-		os.Exit(1)
-	}
-
-	slog.Info("Server stopped")
 }

@@ -1,0 +1,46 @@
+# Runs everything the repo currently builds, from a clean clone — one command to
+# see all three services up together.
+#
+# This is not the daily dev loop. Use `make web` for that: it rebuilds natively
+# in under a second, where anything containerised costs an image rebuild per
+# change.
+#
+# No healthchecks here on purpose: the images are distroless, so there is no
+# shell or curl inside for Compose to exec. Kubernetes does not have this problem
+# because the kubelet makes the HTTP probe itself, from outside the container.
+# Don't "fix" this by adding a shell to the runtime image.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: cmd/web/Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    environment:
+      # The browser rendering this page is on the host, so the endpoint it should
+      # be told about is the host's port mapping, not the compose service name.
+      MCP_PUBLIC_URL: http://localhost:8082/mcp
+
+  api:
+    build:
+      context: .
+      dockerfile: cmd/api/Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+    ports:
+      - "8081:8081"
+      - "9091:9090"
+
+  mcp:
+    build:
+      context: .
+      dockerfile: cmd/mcp/Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+    ports:
+      - "8082:8082"
+      - "9092:9090"

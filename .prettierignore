@@ -1,6 +1,6 @@
-# .html and .js under src/ are Go templates (html/template with {{ }}, or
+# .html and .js under internal/ are Go templates (html/template with {{ }}, or
 # text/template with <<< >>> via component.WithAlpine/WithIIFE). Prettier
 # doesn't understand either delimiter and mangles them, so these are excluded
 # outright rather than fought with formatting rules.
-src/**/*.html
-src/**/*.js
+internal/web/**/*.html
+internal/web/**/*.js
