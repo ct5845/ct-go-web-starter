@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/web.exe"
-  pre_cmd = ["cmd /c npm.cmd run build-css", "go run ./cmd/copyassets"]
+  pre_cmd = ["cmd /c npm.cmd run build-frontend"]
   cmd = "go build -o ./tmp/web.exe ./cmd/web"
   delay = 200
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules", "build", ".claude", "agents", "scripts"]
@@ -14,7 +14,7 @@ tmp_dir = "tmp"
   exclude_unchanged = false
   follow_symlink = false
   full_bin = ""
-  include_dir = ["src", "cmd/web"]
+  include_dir = ["internal", "cmd/web"]
   include_ext = ["go", "js", "html", "css", "svg"]
   include_file = []
   kill_delay = "0s"

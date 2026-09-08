@@ -5,14 +5,32 @@
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "24"
-    }
+    },
+    // Talks to the host's Docker daemon rather than running one inside, so
+    // `make up` and `make docker` work from the container. Build contexts are
+    // sent by the CLI so they resolve fine; host bind-mount paths would not,
+    // which is why compose.yaml deliberately has none.
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
 
-  "postCreateCommand": "go install github.com/air-verse/air@latest && npm install",
+  // node_modules lives in its own volume rather than the bind-mounted workspace.
+  // Tailwind and Parcel's watcher ship platform-native binaries, so a shared
+  // directory means whichever platform ran `npm install` last breaks the other.
+  // The volume mounts empty and root-owned, hence the chown before installing.
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
 
-  "forwardPorts": [8080],
+  "postCreateCommand": "sudo chown vscode:vscode node_modules && go install github.com/air-verse/air@latest && npm install",
+
+  "forwardPorts": [8080, 8081, 8082, 9090, 9091, 9092],
   "portsAttributes": {
-    "8080": { "label": "App", "onAutoForward": "openBrowser" }
+    "8080": { "label": "Web", "onAutoForward": "openBrowser" },
+    "8081": { "label": "API", "onAutoForward": "silent" },
+    "8082": { "label": "MCP", "onAutoForward": "silent" },
+    "9090": { "label": "Web metrics", "onAutoForward": "silent" },
+    "9091": { "label": "API metrics", "onAutoForward": "silent" },
+    "9092": { "label": "MCP metrics", "onAutoForward": "silent" }
   },
 
   "remoteEnv": {

@@ -1,0 +1,31 @@
+<main class="flex flex-col grow">
+  <section class="container mx-auto pxc-4 pyc-4 flex flex-col gapc-4">
+    <div class="flex flex-col gap-2">
+      <h1>{{ .Title }}</h1>
+      <p class="text-on-surface-variant text-sm">{{ .Description }}</p>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <h4>Endpoint</h4>
+      <p class="text-on-surface-variant text-sm">
+        The MCP server runs alongside this application and holds its own
+        credentials. Add it as a custom connector by URL — there is nothing to
+        install.
+      </p>
+      <code class="rounded-lg border p-4 block overflow-x-auto"
+        >{{ .RemoteURL }}</code
+      >
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <h4>Client configuration</h4>
+      <p class="text-on-surface-variant text-sm">
+        For a client configured by file, add <code>{{ .ServerName }}</code> to
+        its MCP servers:
+      </p>
+      <pre
+        class="rounded-lg border p-4 overflow-x-auto text-sm"
+      ><code>{{ .RemoteConfig }}</code></pre>
+    </div>
+  </section>
+</main>

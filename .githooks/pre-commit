@@ -1,2 +1,2 @@
 #!/bin/sh
-gofmt -w cmd src
+gofmt -w cmd internal
